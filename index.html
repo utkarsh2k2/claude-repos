@@ -2,10 +2,202 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0;url=owner-app.html">
-  <title>Usha Gases - Redirecting...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Usha Gases — Business Suite</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f2a4a 0%, #1a3a6b 50%, #0d1f3c 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      color: white;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .logo {
+      font-size: 64px;
+      margin-bottom: 16px;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+    }
+
+    .title {
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+      background: linear-gradient(90deg, #fff 0%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: rgba(255,255,255,0.65);
+      font-weight: 400;
+    }
+
+    .cards {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 24px;
+      padding: 36px 28px;
+      width: 260px;
+      text-align: center;
+      text-decoration: none;
+      color: white;
+      transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      background: rgba(255,255,255,0.13);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .card-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .card-btn {
+      display: inline-block;
+      padding: 10px 24px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 700;
+      transition: opacity 0.2s;
+    }
+
+    .card-btn:hover { opacity: 0.85; }
+
+    .card.owner .card-btn { background: #1d4ed8; }
+    .card.supervisor .card-btn { background: #ea580c; }
+    .card.worker .card-btn { background: #16a34a; }
+
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 50px;
+      margin-bottom: 12px;
+    }
+
+    .card.owner .badge { background: rgba(29,78,216,0.3); color: #93c5fd; }
+    .card.supervisor .badge { background: rgba(234,88,12,0.3); color: #fdba74; }
+    .card.worker .badge { background: rgba(22,163,74,0.3); color: #86efac; }
+
+    .features {
+      margin-top: 48px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 700px;
+    }
+
+    .feature {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 50px;
+      padding: 8px 18px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.55);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .footer {
+      margin-top: 48px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.3);
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-  <p>Redirecting to <a href="owner-app.html">Owner Dashboard</a>...</p>
+
+  <div class="hero">
+    <div class="logo">🔥</div>
+    <div class="title">Usha Gases</div>
+    <div class="subtitle">Business Management Suite · Choose your role to continue</div>
+  </div>
+
+  <div class="cards">
+
+    <a class="card owner" href="owner-app.html">
+      <div class="badge">Owner</div>
+      <div class="card-icon">👔</div>
+      <div class="card-title">Owner Dashboard</div>
+      <div class="card-desc">Full business overview — customers, deliveries, revenue, and analytics.</div>
+      <div class="card-btn">Open →</div>
+    </a>
+
+    <a class="card supervisor" href="supervisor-app.html">
+      <div class="badge">Supervisor</div>
+      <div class="card-icon">📋</div>
+      <div class="card-title">Supervisor App</div>
+      <div class="card-desc">Manage delivery teams, assign tasks, and track daily operations.</div>
+      <div class="card-btn">Open →</div>
+    </a>
+
+    <a class="card worker" href="worker-app.html">
+      <div class="badge">Worker / Delivery</div>
+      <div class="card-icon">🛵</div>
+      <div class="card-title">Worker App</div>
+      <div class="card-desc">Mobile-first delivery app — cylinder tracking, daily account, Hindi + English.</div>
+      <div class="card-btn">Open →</div>
+    </a>
+
+  </div>
+
+  <div class="features">
+    <div class="feature">⚡ Offline PWA support</div>
+    <div class="feature">🔥 Firebase backend</div>
+    <div class="feature">📱 Mobile-first design</div>
+    <div class="feature">🔒 Role-based access</div>
+    <div class="feature">🇮🇳 Hindi + English</div>
+  </div>
+
+  <div class="footer">Usha Gases Business Suite · Powered by Firebase</div>
+
 </body>
 </html>
