@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Usha Medical &amp; Industrial Gases — Cylinder Tracker</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f1f5f9; color: #1e293b; min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #0f2a4a 0%, #1d4ed8 100%);
+      color: white; padding: 0 24px; height: 68px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25); position: sticky; top: 0; z-index: 100;
+    }
+    .logo { display: flex; align-items: center; gap: 14px; }
+    .logo-icon {
+      width: 42px; height: 42px; background: rgba(255,255,255,0.18);
+      border-radius: 10px; display: flex; align-items: center;
+      justify-content: center; font-size: 22px; flex-shrink: 0;
+    }
+    .logo-text h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+    .logo-text p  { font-size: 12px; opacity: 0.75; margin-top: 1px; }
+    .header-date  { font-size: 13px; opacity: 0.75; white-space: nowrap; }
+
+    /* ── Nav ── */
+    nav {
+      background: white; border-bottom: 1px solid #e2e8f0;
+      padding: 0 20px; display: flex; overflow-x: auto;
+    }
+    .nav-tab {
+      padding: 14px 18px; cursor: pointer; font-size: 14px; font-weight: 500;
+      color: #64748b; border-bottom: 3px solid transparent;
+      transition: color 0.15s, border-color 0.15s; white-space: nowrap;
+      user-select: none;
+    }
+    .nav-tab:hover  { color: #1d4ed8; }
+    .nav-tab.active { color: #1d4ed8; border-bottom-color: #1d4ed8; }
+
+    /* ── Main ── */
+    main { padding: 24px; max-width: 1200px; margin: 0 auto; }
+
+    /* ── Tab panels ── */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Section header ── */
+    .section-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 18px; flex-wrap: wrap; gap: 10px;
+    }
+    .section-title { font-size: 20px; font-weight: 700; }
+
+    /* ── Stat cards ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px; margin-bottom: 24px;
+    }
+    .stat-card {
+      background: white; border-radius: 12px; padding: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-left: 4px solid;
+    }
+    .stat-card.blue   { border-color: #1d4ed8; }
+    .stat-card.orange { border-color: #d97706; }
+    .stat-card.green  { border-color: #16a34a; }
+    .stat-card.purple { border-color: #7c3aed; }
+    .stat-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.6px; color: #64748b; margin-bottom: 8px;
+    }
+    .stat-value { font-size: 30px; font-weight: 800; color: #0f172a; line-height: 1; }
+    .stat-sub   { font-size: 12px; color: #94a3b8; margin-top: 5px; }
+
+    /* ── Dashboard grid ── */
+    .dash-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    }
+    @media (max-width: 700px) {
+      .dash-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: white; border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; margin-bottom: 20px;
+    }
+    .card-header {
+      padding: 14px 18px; border-bottom: 1px solid #f1f5f9;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .card-title { font-size: 14px; font-weight: 700; color: #1e293b; }
+    .card-body  { padding: 0; }
+
+    /* ── Tables ── */
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      background: #f8fafc; padding: 11px 16px; text-align: left;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: #64748b; border-bottom: 1px solid #e2e8f0;
+    }
+    tbody td { padding: 11px 16px; font-size: 14px; color: #374151; border-bottom: 1px solid #f1f5f9; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #f8fafc; }
+
+    /* ── Filters / search ── */
+    .toolbar {
+      display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap;
+    }
+    .search-input {
+      flex: 1; min-width: 180px; padding: 9px 13px;
+      border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .search-input:focus {
+      border-color: #1d4ed8; box-shadow: 0 0 0 3px rgba(29,78,216,0.12);
+    }
+    .filter-select {
+      padding: 9px 13px; border: 1px solid #e2e8f0; border-radius: 8px;
+      font-size: 14px; background: white; outline: none; cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .filter-select:focus { border-color: #1d4ed8; }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px; border-radius: 8px; font-size: 14px; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.15s; white-space: nowrap;
+    }
+    .btn-primary  { background: #1d4ed8; color: white; }
+    .btn-primary:hover  { background: #1e40af; }
+    .btn-success  { background: #16a34a; color: white; }
+    .btn-success:hover  { background: #15803d; }
+    .btn-danger   { background: #dc2626; color: white; }
+    .btn-danger:hover   { background: #b91c1c; }
+    .btn-outline  { background: white; color: #374151; border: 1px solid #d1d5db; }
+    .btn-outline:hover  { background: #f8fafc; border-color: #9ca3af; }
+    .btn-sm { padding: 6px 12px; font-size: 13px; }
+    .btn-icon { padding: 5px 9px; font-size: 14px; line-height: 1; }
+    .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-flex; align-items: center; padding: 3px 9px;
+      border-radius: 20px; font-size: 12px; font-weight: 600;
+    }
+    .badge-blue   { background: #dbeafe; color: #1e40af; }
+    .badge-green  { background: #dcfce7; color: #15803d; }
+    .badge-orange { background: #fef3c7; color: #b45309; }
+    .badge-red    { background: #fee2e2; color: #dc2626; }
+    .badge-purple { background: #ede9fe; color: #6d28d9; }
+    .badge-gray   { background: #f1f5f9; color: #475569; }
+
+    /* ── Empty state ── */
+    .empty-state { text-align: center; padding: 44px 20px; color: #94a3b8; }
+    .empty-icon  { font-size: 44px; margin-bottom: 10px; }
+    .empty-state p { font-size: 14px; }
+
+    /* ── Modals ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(15,23,42,0.55); z-index: 500;
+      align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: white; border-radius: 16px; width: 100%;
+      max-width: 500px; max-height: 92vh; overflow-y: auto;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+      animation: modalIn 0.2s ease;
+    }
+    .modal-lg { max-width: 660px; }
+    @keyframes modalIn {
+      from { transform: translateY(-16px) scale(0.97); opacity: 0; }
+      to   { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .modal-header {
+      padding: 18px 22px; border-bottom: 1px solid #f1f5f9;
+      display: flex; justify-content: space-between; align-items: center;
+      position: sticky; top: 0; background: white; z-index: 1;
+    }
+    .modal-title  { font-size: 17px; font-weight: 700; }
+    .modal-close  {
+      background: none; border: none; font-size: 20px; cursor: pointer;
+      color: #94a3b8; padding: 2px 6px; border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .modal-close:hover { color: #1e293b; background: #f1f5f9; }
+    .modal-body   { padding: 22px; }
+    .modal-footer {
+      padding: 14px 22px; border-top: 1px solid #f1f5f9;
+      display: flex; justify-content: flex-end; gap: 10px;
+    }
+
+    /* ── Forms ── */
+    .form-group  { margin-bottom: 16px; }
+    .form-label  { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 5px; }
+    .form-control {
+      width: 100%; padding: 9px 13px; border: 1px solid #e2e8f0;
+      border-radius: 8px; font-size: 14px; outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      font-family: inherit;
+    }
+    .form-control:focus {
+      border-color: #1d4ed8; box-shadow: 0 0 0 3px rgba(29,78,216,0.12);
+    }
+    textarea.form-control { resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+
+    /* ── Customer detail ── */
+    .detail-section { margin-bottom: 22px; }
+    .detail-section-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.6px; color: #94a3b8; margin-bottom: 10px;
+      padding-bottom: 6px; border-bottom: 1px solid #f1f5f9;
+    }
+    .detail-row {
+      display: flex; justify-content: space-between;
+      padding: 7px 0; font-size: 14px; border-bottom: 1px solid #f8fafc;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { color: #64748b; }
+    .detail-value { font-weight: 600; color: #1e293b; text-align: right; }
+
+    .balance-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .balance-card { background: #f8fafc; border-radius: 10px; padding: 14px; text-align: center; }
+    .balance-card .bc-value { font-size: 26px; font-weight: 800; line-height: 1; }
+    .balance-card .bc-label { font-size: 12px; color: #64748b; margin-top: 5px; }
+    .balance-card.bc-blue  { background: #eff6ff; }
+    .balance-card.bc-blue .bc-value { color: #1d4ed8; }
+    .balance-card.bc-green { background: #f0fdf4; }
+    .balance-card.bc-green .bc-value { color: #16a34a; }
+
+    .mini-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .mini-table th {
+      padding: 7px 10px; background: #f8fafc;
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.4px; color: #94a3b8; text-align: left;
+    }
+    .mini-table td { padding: 7px 10px; border-bottom: 1px solid #f8fafc; }
+    .mini-table tr:last-child td { border-bottom: none; }
+
+    /* ── Actions ── */
+    .actions { display: flex; gap: 5px; }
+
+    /* ── Toast ── */
+    .toast-container {
+      position: fixed; bottom: 22px; right: 22px; z-index: 1000;
+      display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+    }
+    .toast {
+      background: #1e293b; color: white; padding: 11px 16px;
+      border-radius: 8px; font-size: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      animation: toastIn 0.25s ease; max-width: 300px;
+    }
+    .toast.success { background: #16a34a; }
+    .toast.error   { background: #dc2626; }
+    @keyframes toastIn {
+      from { transform: translateX(120%); opacity: 0; }
+      to   { transform: translateX(0); opacity: 1; }
+    }
+
+    /* ── Cylinder alert badge on table ── */
+    .cyl-zero { color: #16a34a; font-weight: 600; }
+    .cyl-out  { color: #d97706; font-weight: 700; }
+
+    /* ── Responsive table scroll ── */
+    .table-wrap { overflow-x: auto; }
+
+    @media (max-width: 600px) {
+      main { padding: 14px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      header { padding: 0 14px; }
+      .header-date { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">&#9968;</div>
+    <div class="logo-text">
+      <h1>Usha Medical &amp; Industrial Gases</h1>
+      <p>Cylinder Tracking System</p>
+    </div>
+  </div>
+  <div class="header-date" id="headerDate"></div>
+</header>
+
+<nav id="mainNav">
+  <div class="nav-tab active" data-tab="dashboard">&#128202; Dashboard</div>
+  <div class="nav-tab" data-tab="customers">&#128101; Customers</div>
+  <div class="nav-tab" data-tab="transactions">&#128260; Transactions</div>
+  <div class="nav-tab" data-tab="deposits">&#128176; Deposits</div>
+</nav>
+
+<main>
+
+  <!-- ═══════════════ DASHBOARD ═══════════════ -->
+  <div class="tab-panel active" id="tab-dashboard">
+    <div class="stats-grid">
+      <div class="stat-card blue">
+        <div class="stat-label">Total Customers</div>
+        <div class="stat-value" id="stat-customers">0</div>
+        <div class="stat-sub">Registered accounts</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-label">Cylinders Out</div>
+        <div class="stat-value" id="stat-cyl-out">0</div>
+        <div class="stat-sub">Awaiting return</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Deposits Held</div>
+        <div class="stat-value" id="stat-deposits">&#8377;0</div>
+        <div class="stat-sub">Net security deposits</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-label">Deliveries This Month</div>
+        <div class="stat-value" id="stat-month">0</div>
+        <div class="stat-sub" id="stat-month-label">—</div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Recent Transactions</span>
+          <button class="btn btn-outline btn-sm" onclick="switchTab('transactions')">View All</button>
+        </div>
+        <div class="card-body table-wrap" id="dash-recent-txns">
+          <div class="empty-state"><div class="empty-icon">&#128203;</div><p>No transactions yet</p></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Cylinders Out — Top Customers</span>
+        </div>
+        <div class="card-body table-wrap" id="dash-top-customers">
+          <div class="empty-state"><div class="empty-icon">&#128101;</div><p>No cylinders currently out</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ CUSTOMERS ═══════════════ -->
+  <div class="tab-panel" id="tab-customers">
+    <div class="section-header">
+      <div class="section-title">Customers</div>
+      <button class="btn btn-primary" onclick="openAddCustomerModal()">+ Add Customer</button>
+    </div>
+    <div class="toolbar">
+      <input type="text" class="search-input" id="cust-search" placeholder="Search by name or phone..." oninput="renderCustomers()">
+      <select class="filter-select" id="cust-type-filter" onchange="renderCustomers()">
+        <option value="">All Types</option>
+        <option value="individual">Individual</option>
+        <option value="business">Business</option>
+        <option value="hospital">Hospital / Clinic</option>
+        <option value="industrial">Industrial</option>
+      </select>
+    </div>
+    <div class="card">
+      <div class="card-body table-wrap" id="cust-table"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ TRANSACTIONS ═══════════════ -->
+  <div class="tab-panel" id="tab-transactions">
+    <div class="section-header">
+      <div class="section-title">Transactions</div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="openTxnModal('delivery')">&#128230; Record Delivery</button>
+        <button class="btn btn-success" onclick="openTxnModal('return')">&#8617; Record Return</button>
+      </div>
+    </div>
+    <div class="toolbar">
+      <input type="text" class="search-input" id="txn-search" placeholder="Search transactions..." oninput="renderTransactions()">
+      <select class="filter-select" id="txn-type-filter" onchange="renderTransactions()">
+        <option value="">All Types</option>
+        <option value="delivery">Deliveries</option>
+        <option value="return">Returns</option>
+      </select>
+      <select class="filter-select" id="txn-cust-filter" onchange="renderTransactions()">
+        <option value="">All Customers</option>
+      </select>
+    </div>
+    <div class="card">
+      <div class="card-body table-wrap" id="txn-table"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ DEPOSITS ═══════════════ -->
+  <div class="tab-panel" id="tab-deposits">
+    <div class="section-header">
+      <div class="section-title">Security Deposits</div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="openDepModal('received')">+ Record Deposit</button>
+        <button class="btn btn-outline" onclick="openDepModal('refunded')">&#8617; Record Refund</button>
+      </div>
+    </div>
+    <div class="toolbar">
+      <input type="text" class="search-input" id="dep-search" placeholder="Search deposits..." oninput="renderDeposits()">
+      <select class="filter-select" id="dep-cust-filter" onchange="renderDeposits()">
+        <option value="">All Customers</option>
+      </select>
+      <select class="filter-select" id="dep-type-filter" onchange="renderDeposits()">
+        <option value="">All</option>
+        <option value="received">Received</option>
+        <option value="refunded">Refunded</option>
+      </select>
+    </div>
+    <div class="card">
+      <div class="card-body table-wrap" id="dep-table"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══════════════ MODAL: Add / Edit Customer ═══════════════ -->
+<div class="modal-overlay" id="modal-customer" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-customer-title">Add Customer</span>
+      <button class="modal-close" onclick="closeModal('modal-customer')" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="cust-id">
+      <div class="form-group">
+        <label class="form-label">Full Name *</label>
+        <input type="text" class="form-control" id="cust-name" placeholder="Customer full name">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" class="form-control" id="cust-phone" placeholder="e.g. 98765 43210">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Customer Type</label>
+          <select class="form-control" id="cust-type">
+            <option value="individual">Individual</option>
+            <option value="business">Business</option>
+            <option value="hospital">Hospital / Clinic</option>
+            <option value="industrial">Industrial</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Address</label>
+        <textarea class="form-control" id="cust-address" rows="2" placeholder="Full address"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-control" id="cust-notes" rows="2" placeholder="Any additional notes..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-customer')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCustomer()">Save Customer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: Transaction ═══════════════ -->
+<div class="modal-overlay" id="modal-txn" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-txn-title">Record Delivery</span>
+      <button class="modal-close" onclick="closeModal('modal-txn')" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="txn-hidden-type">
+      <div class="form-group">
+        <label class="form-label">Customer *</label>
+        <select class="form-control" id="txn-customer-sel">
+          <option value="">Select customer...</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Gas Type *</label>
+          <select class="form-control" id="txn-gas">
+            <option>Oxygen</option>
+            <option>Carbon Dioxide (CO&#8322;)</option>
+            <option>Nitrogen</option>
+            <option>Acetylene</option>
+            <option>Argon</option>
+            <option>Nitrous Oxide</option>
+            <option>Hydrogen</option>
+            <option>Helium</option>
+            <option>LPG</option>
+            <option>Mixed Gas</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cylinder Size</label>
+          <select class="form-control" id="txn-size">
+            <option>B-Type (10 L)</option>
+            <option>D-Type (46.7 L)</option>
+            <option>Jumbo (50 L)</option>
+            <option>Small (1.4 m&#179;)</option>
+            <option>Medium (7 m&#179;)</option>
+            <option>Large (47 L)</option>
+            <option>Custom / Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Quantity *</label>
+          <input type="number" class="form-control" id="txn-qty" min="1" value="1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date *</label>
+          <input type="date" class="form-control" id="txn-date">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <input type="text" class="form-control" id="txn-notes" placeholder="Optional notes...">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-txn')">Cancel</button>
+      <button class="btn btn-primary" id="txn-save-btn" onclick="saveTxn()">Save Delivery</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: Deposit ═══════════════ -->
+<div class="modal-overlay" id="modal-dep" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-dep-title">Record Deposit</span>
+      <button class="modal-close" onclick="closeModal('modal-dep')" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="dep-hidden-type">
+      <div class="form-group">
+        <label class="form-label">Customer *</label>
+        <select class="form-control" id="dep-customer-sel">
+          <option value="">Select customer...</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Amount (&#8377;) *</label>
+          <input type="number" class="form-control" id="dep-amount" min="1" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date *</label>
+          <input type="date" class="form-control" id="dep-date">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Payment Method</label>
+        <select class="form-control" id="dep-method">
+          <option>Cash</option>
+          <option>UPI</option>
+          <option>Bank Transfer</option>
+          <option>Cheque</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <input type="text" class="form-control" id="dep-notes" placeholder="Optional notes...">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-dep')">Cancel</button>
+      <button class="btn btn-primary" id="dep-save-btn" onclick="saveDep()">Save Deposit</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: Customer Detail ═══════════════ -->
+<div class="modal-overlay" id="modal-detail" role="dialog" aria-modal="true">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-detail-title">Customer Details</span>
+      <button class="modal-close" onclick="closeModal('modal-detail')" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="modal-body" id="modal-detail-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-detail')">Close</button>
+      <button class="btn btn-primary" id="detail-edit-btn">Edit Customer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+'use strict';
+
+// ════════════════════════════════════════
+// DATA STORE
+// ════════════════════════════════════════
+let db = { customers: [], transactions: [], deposits: [] };
+
+function loadDb() {
+  try {
+    const s = localStorage.getItem('umig_v1');
+    if (s) db = JSON.parse(s);
+  } catch(e) { /* ignore */ }
+}
+
+function saveDb() {
+  localStorage.setItem('umig_v1', JSON.stringify(db));
+}
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+// ════════════════════════════════════════
+// COMPUTED HELPERS
+// ════════════════════════════════════════
+function cylBalance(custId) {
+  return db.transactions
+    .filter(t => t.customerId === custId)
+    .reduce((s, t) => s + (t.type === 'delivery' ? t.qty : -t.qty), 0);
+}
+
+function depBalance(custId) {
+  return db.deposits
+    .filter(d => d.customerId === custId)
+    .reduce((s, d) => s + (d.type === 'received' ? d.amount : -d.amount), 0);
+}
+
+function custName(id) {
+  const c = db.customers.find(c => c.id === id);
+  return c ? c.name : 'Unknown';
+}
+
+function today() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function fmtDate(s) {
+  if (!s) return '—';
+  const d = new Date(s + 'T00:00:00');
+  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function fmtINR(n) {
+  return '\u20B9' + Number(n || 0).toLocaleString('en-IN');
+}
+
+function esc(s) {
+  if (s === null || s === undefined) return '';
+  return String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+const TYPE_LABELS = { individual: 'Individual', business: 'Business', hospital: 'Hospital / Clinic', industrial: 'Industrial' };
+const TYPE_BADGES = { individual: 'badge-gray', business: 'badge-blue', hospital: 'badge-red', industrial: 'badge-orange' };
+
+// ════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════
+const TAB_ORDER = ['dashboard', 'customers', 'transactions', 'deposits'];
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelector(`.nav-tab[data-tab="${name}"]`).classList.add('active');
+  if (name === 'dashboard')    renderDashboard();
+  if (name === 'customers')    renderCustomers();
+  if (name === 'transactions') { populateCustSelects(); renderTransactions(); }
+  if (name === 'deposits')     { populateCustSelects(); renderDeposits(); }
+}
+
+document.getElementById('mainNav').addEventListener('click', e => {
+  const tab = e.target.dataset.tab;
+  if (tab) switchTab(tab);
+});
+
+// ════════════════════════════════════════
+// MODALS
+// ════════════════════════════════════════
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+});
+
+// Close on Escape key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(el => el.classList.remove('open'));
+  }
+});
+
+// ════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════
+function toast(msg, type = '') {
+  const el = document.createElement('div');
+  el.className = 'toast' + (type ? ' ' + type : '');
+  el.textContent = msg;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+// ════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════
+function renderDashboard() {
+  document.getElementById('stat-customers').textContent = db.customers.length;
+
+  const totalOut = db.customers.reduce((s, c) => s + Math.max(0, cylBalance(c.id)), 0);
+  document.getElementById('stat-cyl-out').textContent = totalOut;
+
+  const totalDep = db.customers.reduce((s, c) => s + Math.max(0, depBalance(c.id)), 0);
+  document.getElementById('stat-deposits').textContent = fmtINR(totalDep);
+
+  const now = new Date();
+  const monthStart = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-01';
+  const monthDel = db.transactions
+    .filter(t => t.type === 'delivery' && t.date >= monthStart)
+    .reduce((s, t) => s + t.qty, 0);
+  document.getElementById('stat-month').textContent = monthDel;
+  document.getElementById('stat-month-label').textContent =
+    now.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
+
+  // Recent transactions
+  const recent = [...db.transactions]
+    .sort((a, b) => (b.date > a.date ? 1 : b.date < a.date ? -1 : b.ts - a.ts))
+    .slice(0, 8);
+  const rtEl = document.getElementById('dash-recent-txns');
+  if (!recent.length) {
+    rtEl.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128203;</div><p>No transactions yet</p></div>';
+  } else {
+    rtEl.innerHTML = `<table>
+      <thead><tr><th>Date</th><th>Customer</th><th>Type</th><th>Gas</th><th>Qty</th></tr></thead>
+      <tbody>${recent.map(t => `<tr>
+        <td>${fmtDate(t.date)}</td>
+        <td>${esc(custName(t.customerId))}</td>
+        <td><span class="badge ${t.type === 'delivery' ? 'badge-orange' : 'badge-green'}">${t.type === 'delivery' ? 'Delivery' : 'Return'}</span></td>
+        <td>${esc(t.gas)}</td>
+        <td><strong>${t.qty}</strong></td>
+      </tr>`).join('')}</tbody></table>`;
+  }
+
+  // Top customers by cylinders out
+  const top = db.customers
+    .map(c => ({ ...c, out: cylBalance(c.id) }))
+    .filter(c => c.out > 0)
+    .sort((a, b) => b.out - a.out)
+    .slice(0, 8);
+  const tcEl = document.getElementById('dash-top-customers');
+  if (!top.length) {
+    tcEl.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128101;</div><p>No cylinders currently out</p></div>';
+  } else {
+    tcEl.innerHTML = `<table>
+      <thead><tr><th>Customer</th><th>Cylinders Out</th><th>Deposit Held</th></tr></thead>
+      <tbody>${top.map(c => `<tr>
+        <td>${esc(c.name)}</td>
+        <td><span class="badge badge-orange">${c.out}</span></td>
+        <td>${fmtINR(depBalance(c.id))}</td>
+      </tr>`).join('')}</tbody></table>`;
+  }
+}
+
+// ════════════════════════════════════════
+// CUSTOMERS
+// ════════════════════════════════════════
+function renderCustomers() {
+  const q = (document.getElementById('cust-search').value || '').toLowerCase();
+  const tf = document.getElementById('cust-type-filter').value;
+
+  let list = db.customers.filter(c =>
+    (!q || c.name.toLowerCase().includes(q) || (c.phone || '').includes(q)) &&
+    (!tf || c.type === tf)
+  ).sort((a, b) => a.name.localeCompare(b.name));
+
+  const el = document.getElementById('cust-table');
+  if (!list.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">&#128101;</div><p>${q || tf ? 'No customers match your search.' : 'No customers yet. Add your first customer!'}</p></div>`;
+    return;
+  }
+
+  el.innerHTML = `<table>
+    <thead><tr>
+      <th>Name</th><th>Phone</th><th>Type</th>
+      <th>Cylinders Out</th><th>Deposit Balance</th><th>Actions</th>
+    </tr></thead>
+    <tbody>${list.map(c => {
+      const co = cylBalance(c.id);
+      const db_ = depBalance(c.id);
+      return `<tr>
+        <td><strong>${esc(c.name)}</strong></td>
+        <td>${esc(c.phone || '—')}</td>
+        <td><span class="badge ${TYPE_BADGES[c.type] || 'badge-gray'}">${TYPE_LABELS[c.type] || esc(c.type)}</span></td>
+        <td><span class="${co > 0 ? 'cyl-out' : 'cyl-zero'}">${co}</span></td>
+        <td>${fmtINR(db_)}</td>
+        <td><div class="actions">
+          <button class="btn btn-outline btn-sm btn-icon" title="View Details" onclick="viewCustomer('${c.id}')">&#128065;</button>
+          <button class="btn btn-outline btn-sm btn-icon" title="Edit" onclick="editCustomer('${c.id}')">&#9998;</button>
+          <button class="btn btn-outline btn-sm btn-icon" title="Delete" style="color:#dc2626" onclick="deleteCustomer('${c.id}')">&#128465;</button>
+        </div></td>
+      </tr>`;
+    }).join('')}</tbody></table>`;
+}
+
+function openAddCustomerModal() {
+  document.getElementById('cust-id').value = '';
+  document.getElementById('cust-name').value = '';
+  document.getElementById('cust-phone').value = '';
+  document.getElementById('cust-type').value = 'individual';
+  document.getElementById('cust-address').value = '';
+  document.getElementById('cust-notes').value = '';
+  document.getElementById('modal-customer-title').textContent = 'Add Customer';
+  openModal('modal-customer');
+  setTimeout(() => document.getElementById('cust-name').focus(), 80);
+}
+
+function editCustomer(id) {
+  const c = db.customers.find(c => c.id === id);
+  if (!c) return;
+  document.getElementById('cust-id').value = c.id;
+  document.getElementById('cust-name').value = c.name;
+  document.getElementById('cust-phone').value = c.phone || '';
+  document.getElementById('cust-type').value = c.type || 'individual';
+  document.getElementById('cust-address').value = c.address || '';
+  document.getElementById('cust-notes').value = c.notes || '';
+  document.getElementById('modal-customer-title').textContent = 'Edit Customer';
+  openModal('modal-customer');
+}
+
+function saveCustomer() {
+  const id   = document.getElementById('cust-id').value;
+  const name = document.getElementById('cust-name').value.trim();
+  if (!name) { toast('Customer name is required.', 'error'); return; }
+
+  const obj = {
+    name,
+    phone:   document.getElementById('cust-phone').value.trim(),
+    type:    document.getElementById('cust-type').value,
+    address: document.getElementById('cust-address').value.trim(),
+    notes:   document.getElementById('cust-notes').value.trim(),
+  };
+
+  if (id) {
+    const idx = db.customers.findIndex(c => c.id === id);
+    if (idx >= 0) db.customers[idx] = { ...db.customers[idx], ...obj };
+    toast('Customer updated.', 'success');
+  } else {
+    db.customers.push({ id: uid(), ...obj, ts: Date.now() });
+    toast('Customer added.', 'success');
+  }
+
+  saveDb();
+  closeModal('modal-customer');
+  renderCustomers();
+  renderDashboard();
+  populateCustSelects();
+}
+
+function deleteCustomer(id) {
+  const c = db.customers.find(c => c.id === id);
+  if (!c) return;
+  const co = cylBalance(id);
+  const msg = co > 0
+    ? `"${c.name}" still has ${co} cylinder(s) out.\n\nDelete this customer and ALL their records?`
+    : `Delete customer "${c.name}" and all their records?`;
+  if (!confirm(msg)) return;
+  db.customers    = db.customers.filter(x => x.id !== id);
+  db.transactions = db.transactions.filter(x => x.customerId !== id);
+  db.deposits     = db.deposits.filter(x => x.customerId !== id);
+  saveDb();
+  renderCustomers();
+  renderDashboard();
+  populateCustSelects();
+  toast('Customer deleted.');
+}
+
+function viewCustomer(id) {
+  const c = db.customers.find(c => c.id === id);
+  if (!c) return;
+
+  const co  = cylBalance(id);
+  const dep = depBalance(id);
+  const txns = [...db.transactions.filter(t => t.customerId === id)]
+    .sort((a, b) => (b.date > a.date ? 1 : -1) || b.ts - a.ts);
+  const deps = [...db.deposits.filter(d => d.customerId === id)]
+    .sort((a, b) => (b.date > a.date ? 1 : -1) || b.ts - a.ts);
+
+  // Gas-type breakdown
+  const gasMap = {};
+  txns.forEach(t => {
+    if (!gasMap[t.gas]) gasMap[t.gas] = { del: 0, ret: 0 };
+    if (t.type === 'delivery') gasMap[t.gas].del += t.qty;
+    else gasMap[t.gas].ret += t.qty;
+  });
+
+  document.getElementById('modal-detail-title').textContent = c.name;
+  document.getElementById('modal-detail-body').innerHTML = `
+    <div class="detail-section">
+      <div class="detail-section-title">Customer Info</div>
+      <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-value">${esc(c.phone || '—')}</span></div>
+      <div class="detail-row"><span class="detail-label">Type</span><span class="detail-value">${TYPE_LABELS[c.type] || esc(c.type)}</span></div>
+      <div class="detail-row"><span class="detail-label">Address</span><span class="detail-value">${esc(c.address || '—')}</span></div>
+      ${c.notes ? `<div class="detail-row"><span class="detail-label">Notes</span><span class="detail-value">${esc(c.notes)}</span></div>` : ''}
+      <div class="detail-row"><span class="detail-label">Customer Since</span><span class="detail-value">${new Date(c.ts).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'})}</span></div>
+    </div>
+
+    <div class="balance-cards">
+      <div class="balance-card bc-blue">
+        <div class="bc-value">${co}</div>
+        <div class="bc-label">Cylinders Currently Out</div>
+      </div>
+      <div class="balance-card bc-green">
+        <div class="bc-value">${fmtINR(dep)}</div>
+        <div class="bc-label">Security Deposit Balance</div>
+      </div>
+    </div>
+
+    ${Object.keys(gasMap).length ? `
+    <div class="detail-section">
+      <div class="detail-section-title">Cylinder Balance by Gas Type</div>
+      <table class="mini-table">
+        <thead><tr><th>Gas</th><th>Delivered</th><th>Returned</th><th>Outstanding</th></tr></thead>
+        <tbody>${Object.entries(gasMap).map(([g, v]) => `<tr>
+          <td>${esc(g)}</td><td>${v.del}</td><td>${v.ret}</td>
+          <td><strong style="color:${v.del - v.ret > 0 ? '#d97706' : '#16a34a'}">${v.del - v.ret}</strong></td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>` : ''}
+
+    <div class="detail-section">
+      <div class="detail-section-title">Transaction History (${txns.length})</div>
+      ${!txns.length ? '<p style="color:#94a3b8;font-size:13px;">No transactions yet.</p>' : `
+      <table class="mini-table">
+        <thead><tr><th>Date</th><th>Type</th><th>Gas</th><th>Size</th><th>Qty</th><th>Notes</th></tr></thead>
+        <tbody>${txns.map(t => `<tr>
+          <td>${fmtDate(t.date)}</td>
+          <td><span class="badge ${t.type === 'delivery' ? 'badge-orange' : 'badge-green'}" style="font-size:11px">${t.type === 'delivery' ? 'Del' : 'Ret'}</span></td>
+          <td>${esc(t.gas)}</td>
+          <td style="color:#94a3b8;font-size:12px">${esc(t.size)}</td>
+          <td>${t.qty}</td>
+          <td style="color:#94a3b8;font-size:12px">${esc(t.notes || '—')}</td>
+        </tr>`).join('')}</tbody>
+      </table>`}
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">Deposit History (${deps.length})</div>
+      ${!deps.length ? '<p style="color:#94a3b8;font-size:13px;">No deposits recorded.</p>' : `
+      <table class="mini-table">
+        <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Method</th><th>Notes</th></tr></thead>
+        <tbody>${deps.map(d => `<tr>
+          <td>${fmtDate(d.date)}</td>
+          <td><span class="badge ${d.type === 'received' ? 'badge-green' : 'badge-red'}" style="font-size:11px">${d.type === 'received' ? '+&nbsp;Received' : '&minus;&nbsp;Refunded'}</span></td>
+          <td><strong>${fmtINR(d.amount)}</strong></td>
+          <td>${esc(d.method || '—')}</td>
+          <td style="color:#94a3b8;font-size:12px">${esc(d.notes || '—')}</td>
+        </tr>`).join('')}</tbody>
+      </table>`}
+    </div>
+  `;
+
+  document.getElementById('detail-edit-btn').onclick = () => {
+    closeModal('modal-detail');
+    editCustomer(id);
+  };
+
+  openModal('modal-detail');
+}
+
+// ════════════════════════════════════════
+// TRANSACTIONS
+// ════════════════════════════════════════
+function populateCustSelects() {
+  const sorted = [...db.customers].sort((a, b) => a.name.localeCompare(b.name));
+  const opts   = sorted.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+
+  ['txn-customer-sel', 'dep-customer-sel'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '<option value="">Select customer...</option>' + opts;
+  });
+
+  ['txn-cust-filter', 'dep-cust-filter'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '<option value="">All Customers</option>' + opts;
+  });
+}
+
+function openTxnModal(type) {
+  document.getElementById('txn-hidden-type').value = type;
+  document.getElementById('modal-txn-title').textContent = type === 'delivery' ? 'Record Delivery' : 'Record Return';
+  const btn = document.getElementById('txn-save-btn');
+  btn.textContent  = type === 'delivery' ? 'Save Delivery' : 'Save Return';
+  btn.className    = 'btn ' + (type === 'delivery' ? 'btn-primary' : 'btn-success');
+  document.getElementById('txn-date').value  = today();
+  document.getElementById('txn-qty').value   = 1;
+  document.getElementById('txn-notes').value = '';
+  document.getElementById('txn-customer-sel').value = '';
+  populateCustSelects();
+  openModal('modal-txn');
+}
+
+function saveTxn() {
+  const type = document.getElementById('txn-hidden-type').value;
+  const custId = document.getElementById('txn-customer-sel').value;
+  const gas    = document.getElementById('txn-gas').value;
+  const size   = document.getElementById('txn-size').value;
+  const qty    = parseInt(document.getElementById('txn-qty').value, 10) || 0;
+  const date   = document.getElementById('txn-date').value;
+  const notes  = document.getElementById('txn-notes').value.trim();
+
+  if (!custId) { toast('Please select a customer.', 'error'); return; }
+  if (!date)   { toast('Please enter a date.', 'error'); return; }
+  if (qty < 1) { toast('Quantity must be at least 1.', 'error'); return; }
+
+  if (type === 'return') {
+    const bal = cylBalance(custId);
+    if (qty > bal) {
+      toast(`Cannot return ${qty}. Customer only has ${bal} cylinder(s) out.`, 'error');
+      return;
+    }
+  }
+
+  db.transactions.push({ id: uid(), customerId: custId, type, gas, size, qty, date, notes, ts: Date.now() });
+  saveDb();
+  closeModal('modal-txn');
+  renderTransactions();
+  renderDashboard();
+  toast(type === 'delivery' ? 'Delivery recorded.' : 'Return recorded.', 'success');
+}
+
+function renderTransactions() {
+  const q   = (document.getElementById('txn-search').value || '').toLowerCase();
+  const tf  = document.getElementById('txn-type-filter').value;
+  const cf  = document.getElementById('txn-cust-filter').value;
+
+  let list = [...db.transactions]
+    .sort((a, b) => (b.date > a.date ? 1 : b.date < a.date ? -1 : 0) || b.ts - a.ts);
+  if (tf) list = list.filter(t => t.type === tf);
+  if (cf) list = list.filter(t => t.customerId === cf);
+  if (q)  list = list.filter(t =>
+    custName(t.customerId).toLowerCase().includes(q) ||
+    t.gas.toLowerCase().includes(q) ||
+    (t.notes || '').toLowerCase().includes(q)
+  );
+
+  const el = document.getElementById('txn-table');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128260;</div><p>No transactions found.</p></div>';
+    return;
+  }
+
+  el.innerHTML = `<table>
+    <thead><tr>
+      <th>Date</th><th>Customer</th><th>Type</th>
+      <th>Gas Type</th><th>Size</th><th>Qty</th><th>Notes</th><th></th>
+    </tr></thead>
+    <tbody>${list.map(t => `<tr>
+      <td>${fmtDate(t.date)}</td>
+      <td>${esc(custName(t.customerId))}</td>
+      <td><span class="badge ${t.type === 'delivery' ? 'badge-orange' : 'badge-green'}">${t.type === 'delivery' ? 'Delivery' : 'Return'}</span></td>
+      <td>${esc(t.gas)}</td>
+      <td style="color:#64748b;font-size:12px">${esc(t.size)}</td>
+      <td><strong>${t.qty}</strong></td>
+      <td style="color:#64748b;font-size:12px">${esc(t.notes || '—')}</td>
+      <td><button class="btn btn-outline btn-sm btn-icon" style="color:#dc2626" title="Delete" onclick="deleteTxn('${t.id}')">&#128465;</button></td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function deleteTxn(id) {
+  if (!confirm('Delete this transaction record?')) return;
+  db.transactions = db.transactions.filter(t => t.id !== id);
+  saveDb();
+  renderTransactions();
+  renderDashboard();
+  toast('Transaction deleted.');
+}
+
+// ════════════════════════════════════════
+// DEPOSITS
+// ════════════════════════════════════════
+function openDepModal(type) {
+  document.getElementById('dep-hidden-type').value = type;
+  document.getElementById('modal-dep-title').textContent = type === 'received' ? 'Record Deposit Received' : 'Record Deposit Refund';
+  const btn = document.getElementById('dep-save-btn');
+  btn.textContent = type === 'received' ? 'Save Deposit' : 'Save Refund';
+  btn.className   = 'btn ' + (type === 'received' ? 'btn-primary' : 'btn-danger');
+  document.getElementById('dep-date').value   = today();
+  document.getElementById('dep-amount').value = '';
+  document.getElementById('dep-notes').value  = '';
+  document.getElementById('dep-customer-sel').value = '';
+  populateCustSelects();
+  openModal('modal-dep');
+}
+
+function saveDep() {
+  const type   = document.getElementById('dep-hidden-type').value;
+  const custId = document.getElementById('dep-customer-sel').value;
+  const amount = parseFloat(document.getElementById('dep-amount').value);
+  const date   = document.getElementById('dep-date').value;
+  const method = document.getElementById('dep-method').value;
+  const notes  = document.getElementById('dep-notes').value.trim();
+
+  if (!custId)            { toast('Please select a customer.', 'error'); return; }
+  if (!amount || amount <= 0) { toast('Enter a valid amount.', 'error'); return; }
+  if (!date)              { toast('Please enter a date.', 'error'); return; }
+
+  if (type === 'refunded') {
+    const bal = depBalance(custId);
+    if (amount > bal) {
+      toast(`Refund (${fmtINR(amount)}) exceeds deposit balance (${fmtINR(bal)}).`, 'error');
+      return;
+    }
+  }
+
+  db.deposits.push({ id: uid(), customerId: custId, type, amount, date, method, notes, ts: Date.now() });
+  saveDb();
+  closeModal('modal-dep');
+  renderDeposits();
+  renderDashboard();
+  toast(type === 'received' ? 'Deposit recorded.' : 'Refund recorded.', 'success');
+}
+
+function renderDeposits() {
+  const q  = (document.getElementById('dep-search').value || '').toLowerCase();
+  const cf = document.getElementById('dep-cust-filter').value;
+  const tf = document.getElementById('dep-type-filter').value;
+
+  let list = [...db.deposits]
+    .sort((a, b) => (b.date > a.date ? 1 : b.date < a.date ? -1 : 0) || b.ts - a.ts);
+  if (cf) list = list.filter(d => d.customerId === cf);
+  if (tf) list = list.filter(d => d.type === tf);
+  if (q)  list = list.filter(d =>
+    custName(d.customerId).toLowerCase().includes(q) ||
+    (d.notes || '').toLowerCase().includes(q) ||
+    (d.method || '').toLowerCase().includes(q)
+  );
+
+  const el = document.getElementById('dep-table');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128176;</div><p>No deposit records found.</p></div>';
+    return;
+  }
+
+  el.innerHTML = `<table>
+    <thead><tr>
+      <th>Date</th><th>Customer</th><th>Type</th>
+      <th>Amount</th><th>Method</th><th>Notes</th><th></th>
+    </tr></thead>
+    <tbody>${list.map(d => `<tr>
+      <td>${fmtDate(d.date)}</td>
+      <td>${esc(custName(d.customerId))}</td>
+      <td><span class="badge ${d.type === 'received' ? 'badge-green' : 'badge-red'}">${d.type === 'received' ? '+ Received' : '&minus; Refunded'}</span></td>
+      <td><strong>${fmtINR(d.amount)}</strong></td>
+      <td>${esc(d.method || '—')}</td>
+      <td style="color:#64748b;font-size:12px">${esc(d.notes || '—')}</td>
+      <td><button class="btn btn-outline btn-sm btn-icon" style="color:#dc2626" title="Delete" onclick="deleteDep('${d.id}')">&#128465;</button></td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function deleteDep(id) {
+  if (!confirm('Delete this deposit record?')) return;
+  db.deposits = db.deposits.filter(d => d.id !== id);
+  saveDb();
+  renderDeposits();
+  renderDashboard();
+  toast('Deposit record deleted.');
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+loadDb();
+document.getElementById('headerDate').textContent =
+  new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+renderDashboard();
+renderCustomers();
+</script>
+</body>
+</html>

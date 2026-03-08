@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Usha Medical &amp; Industrial Gases — Business App</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f1f5f9; color: #1e293b; min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #0f2a4a 0%, #1d4ed8 100%);
+      color: white; padding: 0 24px; height: 68px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25); position: sticky; top: 0; z-index: 100;
+    }
+    .logo { display: flex; align-items: center; gap: 14px; }
+    .logo-icon {
+      width: 42px; height: 42px; background: rgba(255,255,255,0.18);
+      border-radius: 10px; display: flex; align-items: center;
+      justify-content: center; font-size: 22px; flex-shrink: 0;
+    }
+    .logo-text h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+    .logo-text p  { font-size: 12px; opacity: 0.75; margin-top: 1px; }
+    .header-date  { font-size: 13px; opacity: 0.75; white-space: nowrap; }
+
+    /* ── Nav ── */
+    nav {
+      background: white; border-bottom: 1px solid #e2e8f0;
+      padding: 0 20px; display: flex; overflow-x: auto;
+    }
+    .nav-tab {
+      padding: 14px 18px; cursor: pointer; font-size: 14px; font-weight: 500;
+      color: #64748b; border-bottom: 3px solid transparent;
+      transition: color 0.15s, border-color 0.15s; white-space: nowrap;
+      user-select: none;
+    }
+    .nav-tab:hover  { color: #1d4ed8; }
+    .nav-tab.active { color: #1d4ed8; border-bottom-color: #1d4ed8; }
+
+    /* ── Main ── */
+    main { padding: 24px; max-width: 1200px; margin: 0 auto; }
+
+    /* ── Tab panels ── */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Section header ── */
+    .section-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 18px; flex-wrap: wrap; gap: 10px;
+    }
+    .section-title { font-size: 20px; font-weight: 700; }
+
+    /* ── Stat cards ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px; margin-bottom: 24px;
+    }
+    .stat-card {
+      background: white; border-radius: 12px; padding: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-left: 4px solid;
+    }
+    .stat-card.blue   { border-color: #1d4ed8; }
+    .stat-card.orange { border-color: #d97706; }
+    .stat-card.green  { border-color: #16a34a; }
+    .stat-card.purple { border-color: #7c3aed; }
+    .stat-card.red    { border-color: #dc2626; }
+    .stat-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.6px; color: #64748b; margin-bottom: 8px;
+    }
+    .stat-value { font-size: 30px; font-weight: 800; color: #0f172a; line-height: 1; }
+    .stat-sub   { font-size: 12px; color: #94a3b8; margin-top: 5px; }
+
+    /* ── Cards ── */
+    .card {
+      background: white; border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; margin-bottom: 20px;
+    }
+    .card-header {
+      padding: 14px 18px; border-bottom: 1px solid #f1f5f9;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .card-title { font-size: 14px; font-weight: 700; color: #1e293b; }
+    .card-body  { padding: 0; }
+
+    /* ── Tables ── */
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      background: #f8fafc; padding: 11px 16px; text-align: left;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: #64748b; border-bottom: 1px solid #e2e8f0;
+    }
+    tbody td { padding: 11px 16px; font-size: 14px; color: #374151; border-bottom: 1px solid #f1f5f9; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #f8fafc; }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap;
+    }
+    .search-input {
+      flex: 1; min-width: 180px; padding: 9px 13px;
+      border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .search-input:focus {
+      border-color: #1d4ed8; box-shadow: 0 0 0 3px rgba(29,78,216,0.12);
+    }
+    .filter-select {
+      padding: 9px 13px; border: 1px solid #e2e8f0; border-radius: 8px;
+      font-size: 14px; background: white; outline: none; cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .filter-select:focus { border-color: #1d4ed8; }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px; border-radius: 8px; font-size: 14px; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.15s; white-space: nowrap;
+    }
+    .btn-primary  { background: #1d4ed8; color: white; }
+    .btn-primary:hover  { background: #1e40af; }
+    .btn-success  { background: #16a34a; color: white; }
+    .btn-success:hover  { background: #15803d; }
+    .btn-danger   { background: #dc2626; color: white; }
+    .btn-danger:hover   { background: #b91c1c; }
+    .btn-outline  { background: white; color: #374151; border: 1px solid #d1d5db; }
+    .btn-outline:hover  { background: #f8fafc; border-color: #9ca3af; }
+    .btn-sm { padding: 6px 12px; font-size: 13px; }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-flex; align-items: center; padding: 3px 9px;
+      border-radius: 20px; font-size: 12px; font-weight: 600;
+    }
+    .badge-blue   { background: #dbeafe; color: #1e40af; }
+    .badge-green  { background: #dcfce7; color: #15803d; }
+    .badge-orange { background: #fef3c7; color: #b45309; }
+    .badge-red    { background: #fee2e2; color: #dc2626; }
+    .badge-purple { background: #ede9fe; color: #6d28d9; }
+    .badge-gray   { background: #f1f5f9; color: #475569; }
+
+    /* ── Empty state ── */
+    .empty-state { text-align: center; padding: 44px 20px; color: #94a3b8; }
+    .empty-icon  { font-size: 44px; margin-bottom: 10px; }
+    .empty-state p { font-size: 14px; }
+
+    /* ── Modals ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(15,23,42,0.55); z-index: 500;
+      align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: white; border-radius: 16px; width: 100%;
+      max-width: 500px; max-height: 92vh; overflow-y: auto;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+      animation: modalIn 0.2s ease;
+    }
+    @keyframes modalIn {
+      from { transform: translateY(-16px) scale(0.97); opacity: 0; }
+      to   { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .modal-header {
+      padding: 18px 22px; border-bottom: 1px solid #f1f5f9;
+      display: flex; justify-content: space-between; align-items: center;
+      position: sticky; top: 0; background: white; z-index: 1;
+    }
+    .modal-title  { font-size: 17px; font-weight: 700; }
+    .modal-close  {
+      background: none; border: none; font-size: 20px; cursor: pointer;
+      color: #94a3b8; padding: 2px 6px; border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .modal-close:hover { color: #1e293b; background: #f1f5f9; }
+    .modal-body   { padding: 22px; }
+    .modal-footer {
+      padding: 14px 22px; border-top: 1px solid #f1f5f9;
+      display: flex; justify-content: flex-end; gap: 10px;
+    }
+
+    /* ── Forms ── */
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: #374151; margin-bottom: 5px;
+    }
+    .form-input, .form-select {
+      width: 100%; padding: 9px 13px;
+      border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;
+      outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .form-input:focus, .form-select:focus {
+      border-color: #1d4ed8; box-shadow: 0 0 0 3px rgba(29,78,216,0.12);
+    }
+    .form-select { background: white; cursor: pointer; }
+
+    /* ── Recent activity ── */
+    .activity-item {
+      display: flex; align-items: flex-start; gap: 12px; padding: 12px 18px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-dot {
+      width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0;
+    }
+    .activity-dot.blue   { background: #1d4ed8; }
+    .activity-dot.green  { background: #16a34a; }
+    .activity-dot.orange { background: #d97706; }
+    .activity-text { font-size: 13px; color: #374151; }
+    .activity-time { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      main { padding: 16px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .stat-value { font-size: 24px; }
+    }
+
+    /* ══════════════════════════════════════════
+       SUPERVISOR VIEW — Rajneesh (mobile-first)
+       ══════════════════════════════════════════ */
+    .sv-container { max-width: 480px; margin: 0 auto; }
+
+    .sv-greeting {
+      background: linear-gradient(135deg, #ea580c 0%, #f59e0b 100%);
+      color: white; border-radius: 16px; padding: 22px 20px;
+      margin-bottom: 20px; box-shadow: 0 4px 15px rgba(234,88,12,0.3);
+    }
+    .sv-greeting-hello { font-size: 26px; font-weight: 800; }
+    .sv-greeting-date  { font-size: 14px; opacity: 0.9; margin-top: 4px; }
+    .sv-greeting-pending {
+      margin-top: 12px; padding: 10px 14px; background: rgba(255,255,255,0.2);
+      border-radius: 10px; font-size: 15px; font-weight: 600;
+    }
+
+    .sv-actions { display: flex; flex-direction: column; gap: 14px; }
+    .sv-actions.hidden { display: none; }
+
+    .sv-btn {
+      width: 100%; min-height: 70px; border: none; border-radius: 16px;
+      font-size: 22px; font-weight: 800; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 2px; padding: 14px 20px;
+      transition: transform 0.1s, box-shadow 0.15s;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    }
+    .sv-btn:active { transform: scale(0.97); }
+    .sv-btn-sub { font-size: 13px; font-weight: 500; opacity: 0.85; }
+    .sv-btn.blue   { background: #1d4ed8; color: white; }
+    .sv-btn.green  { background: #16a34a; color: white; }
+    .sv-btn.orange { background: #ea580c; color: white; }
+
+    .sv-form { display: none; }
+    .sv-form.visible { display: block; }
+
+    .sv-form-card {
+      background: white; border-radius: 16px; padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    .sv-back {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: none; border: none; font-size: 15px; font-weight: 600;
+      color: #64748b; cursor: pointer; padding: 0; margin-bottom: 14px;
+    }
+    .sv-back:hover { color: #1e293b; }
+    .sv-form-title {
+      font-size: 20px; font-weight: 800; color: #1e293b; margin-bottom: 18px;
+    }
+    .sv-form-group { margin-bottom: 16px; }
+    .sv-form-label {
+      display: block; font-size: 14px; font-weight: 700;
+      color: #374151; margin-bottom: 6px;
+    }
+    .sv-form-label small { font-weight: 500; color: #64748b; }
+    .sv-form-input, .sv-form-select {
+      width: 100%; padding: 14px; border: 2px solid #e2e8f0;
+      border-radius: 12px; font-size: 16px; outline: none;
+      transition: border-color 0.15s;
+      -webkit-appearance: none;
+    }
+    .sv-form-input:focus, .sv-form-select:focus {
+      border-color: #ea580c;
+    }
+    .sv-form-select { background: white; cursor: pointer; }
+    .sv-form-submit {
+      width: 100%; min-height: 56px; border: none; border-radius: 14px;
+      font-size: 18px; font-weight: 800; color: white; cursor: pointer;
+      margin-top: 8px; transition: transform 0.1s;
+    }
+    .sv-form-submit:active { transform: scale(0.97); }
+    .sv-form-submit.blue  { background: #1d4ed8; }
+    .sv-form-submit.green { background: #16a34a; }
+
+    .sv-success {
+      display: none; background: #dcfce7; color: #15803d;
+      border-radius: 12px; padding: 16px; text-align: center;
+      font-size: 16px; font-weight: 700; margin-bottom: 16px;
+      animation: modalIn 0.2s ease;
+    }
+    .sv-success.show { display: block; }
+
+    /* Summary cards */
+    .sv-summary-grid { display: flex; flex-direction: column; gap: 12px; }
+    .sv-stat-card {
+      display: flex; align-items: center; gap: 14px;
+      background: #fff; border-radius: 14px; padding: 18px 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      border-left: 5px solid;
+    }
+    .sv-stat-card.blue   { border-color: #1d4ed8; }
+    .sv-stat-card.green  { border-color: #16a34a; }
+    .sv-stat-card.orange { border-color: #ea580c; }
+    .sv-stat-card.purple { border-color: #7c3aed; }
+    .sv-stat-icon { font-size: 28px; }
+    .sv-stat-info { flex: 1; }
+    .sv-stat-label { font-size: 13px; color: #64748b; font-weight: 600; }
+    .sv-stat-value { font-size: 26px; font-weight: 800; color: #0f172a; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">&#9981;</div>
+    <div class="logo-text">
+      <h1>Usha Gases — Business</h1>
+      <p>Cylinder Delivery Management</p>
+    </div>
+  </div>
+  <div class="header-date" id="headerDate"></div>
+</header>
+
+<nav>
+  <div class="nav-tab active" data-tab="dashboard">Dashboard</div>
+  <div class="nav-tab" data-tab="customers">Customers</div>
+  <div class="nav-tab" data-tab="deliveries">Deliveries</div>
+  <div class="nav-tab" data-tab="supervisor">Supervisor</div>
+</nav>
+
+<main>
+
+  <!-- ════════ DASHBOARD ════════ -->
+  <div class="tab-panel active" id="tab-dashboard">
+    <div class="section-header">
+      <h2 class="section-title">Dashboard</h2>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card blue">
+        <div class="stat-label">Cylinders Out</div>
+        <div class="stat-value" id="statCylOut">0</div>
+        <div class="stat-sub">Currently with customers</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-label">Deposits Held</div>
+        <div class="stat-value" id="statDeposits">&#8377;0</div>
+        <div class="stat-sub">Total security deposits</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-label">Outstanding Payments</div>
+        <div class="stat-value" id="statOutstanding">&#8377;0</div>
+        <div class="stat-sub">Unpaid credit balances</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Total Customers</div>
+        <div class="stat-value" id="statCustomers">0</div>
+        <div class="stat-sub">Active accounts</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Recent Activity</span>
+      </div>
+      <div class="card-body" id="recentActivity">
+        <div class="empty-state">
+          <div class="empty-icon">&#128203;</div>
+          <p>Activity will appear here</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ CUSTOMERS ════════ -->
+  <div class="tab-panel" id="tab-customers">
+    <div class="section-header">
+      <h2 class="section-title">Customers</h2>
+      <button class="btn btn-primary" onclick="openModal('customerModal')">+ Add Customer</button>
+    </div>
+    <div class="toolbar">
+      <input type="text" class="search-input" placeholder="Search customers..." id="custSearch" oninput="renderCustomers()">
+      <select class="filter-select" id="custFilterType" onchange="renderCustomers()">
+        <option value="">All Types</option>
+        <option value="Hospital">Hospital</option>
+        <option value="Industrial">Industrial</option>
+        <option value="Retail">Retail</option>
+        <option value="Laboratory">Laboratory</option>
+      </select>
+      <select class="filter-select" id="custFilterAccount" onchange="renderCustomers()">
+        <option value="">All Accounts</option>
+        <option value="Cash">Cash</option>
+        <option value="Credit">Credit</option>
+      </select>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Type</th>
+              <th>Account</th>
+              <th>Cylinders Out</th>
+              <th>Deposit</th>
+              <th>Outstanding</th>
+            </tr>
+          </thead>
+          <tbody id="custTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ DELIVERIES ════════ -->
+  <div class="tab-panel" id="tab-deliveries">
+    <div class="section-header">
+      <h2 class="section-title">Deliveries</h2>
+      <div>
+        <button class="btn btn-primary" onclick="openDeliveryModal('deliver')">+ Log Delivery</button>
+        <button class="btn btn-success" onclick="openDeliveryModal('return')" style="margin-left:6px">&#8617; Log Return</button>
+      </div>
+    </div>
+    <div class="toolbar">
+      <input type="text" class="search-input" placeholder="Search deliveries..." id="delSearch" oninput="renderDeliveries()">
+      <select class="filter-select" id="delFilterType" onchange="renderDeliveries()">
+        <option value="">All Types</option>
+        <option value="Delivery">Delivery</option>
+        <option value="Return">Return</option>
+      </select>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Customer</th>
+              <th>Type</th>
+              <th>Qty</th>
+              <th>Gas Type</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="delTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ SUPERVISOR (Rajneesh) ════════ -->
+  <div class="tab-panel" id="tab-supervisor">
+    <div class="sv-container">
+
+      <div class="sv-greeting">
+        <div class="sv-greeting-hello">Namaste Rajneesh! &#x1F64F;</div>
+        <div class="sv-greeting-date" id="svDate"></div>
+        <div class="sv-greeting-pending" id="svPending">Aaj 0 deliveries pending hain</div>
+      </div>
+
+      <div id="svSuccess" class="sv-success"></div>
+
+      <!-- Main 3 buttons -->
+      <div class="sv-actions" id="svMainActions">
+        <button class="sv-btn blue" onclick="svShowSection('deliver')">
+          CYLINDER DO<span class="sv-btn-sub">Deliver Cylinder</span>
+        </button>
+        <button class="sv-btn green" onclick="svShowSection('return')">
+          WAPAS LO<span class="sv-btn-sub">Return Cylinder</span>
+        </button>
+        <button class="sv-btn orange" onclick="svShowSection('summary')">
+          AAJ KA HISAAB<span class="sv-btn-sub">Today's Summary</span>
+        </button>
+      </div>
+
+      <!-- Deliver Form -->
+      <div class="sv-form" id="svDeliverForm">
+        <div class="sv-form-card">
+          <button class="sv-back" onclick="svShowSection('main')">&#8592; Wapas</button>
+          <div class="sv-form-title">Cylinder Do / Deliver</div>
+          <div class="sv-form-group">
+            <label class="sv-form-label">Customer <small>(Grahak)</small></label>
+            <select class="sv-form-select" id="svDelCust"></select>
+          </div>
+          <div class="sv-form-group">
+            <label class="sv-form-label">Gas Type <small>(Gas ka prakar)</small></label>
+            <select class="sv-form-select" id="svDelGas">
+              <option value="Oxygen">Oxygen</option>
+              <option value="Nitrogen">Nitrogen</option>
+              <option value="Argon">Argon</option>
+              <option value="CO2">CO2</option>
+              <option value="Acetylene">Acetylene</option>
+              <option value="LPG">LPG</option>
+            </select>
+          </div>
+          <div class="sv-form-group">
+            <label class="sv-form-label">Cylinder Size <small>(Size)</small></label>
+            <select class="sv-form-select" id="svDelSize">
+              <option value="Small">Small (Chhota)</option>
+              <option value="Medium">Medium (Madhyam)</option>
+              <option value="Large">Large (Bada)</option>
+              <option value="Jumbo">Jumbo</option>
+            </select>
+          </div>
+          <div class="sv-form-group">
+            <label class="sv-form-label">Quantity <small>(Kitne)</small></label>
+            <input type="number" class="sv-form-input" id="svDelQty" value="1" min="1">
+          </div>
+          <div class="sv-form-group">
+            <label class="sv-form-label">Amount Collected <small>(Paisa &#8377;)</small></label>
+            <input type="number" class="sv-form-input" id="svDelAmount" value="0" min="0">
+          </div>
+          <div class="sv-form-group">
+            <label class="sv-form-label">Payment Mode <small>(Bhugtan)</small></label>
+            <select class="sv-form-select" id="svDelPayMode">
+              <option value="Cash">Cash (Naqad)</option>
+              <option value="UPI">UPI</option>
+            </select>
+          </div>
+          <button class="sv-form-submit blue" onclick="svSubmitDelivery()">DELIVER KARO &#10003;</button>
+        </div>
+      </div>
+
+      <!-- Return Form -->
+      <div class="sv-form" id="svReturnForm">
+        <div class="sv-form-card">
+          <button class="sv-back" onclick="svShowSection('main')">&#8592; Wapas</button>
+          <div class="sv-form-title">Wapas Lo / Return</div>
+          <div class="sv-form-group">
+            <label class="sv-form-label">Customer <small>(Grahak)</small></label>
+            <select class="sv-form-select" id="svRetCust"></select>
+          </div>
+          <div class="sv-form-group">
+            <label class="sv-form-label">Cylinder Size <small>(Size)</small></label>
+            <select class="sv-form-select" id="svRetSize">
+              <option value="Small">Small (Chhota)</option>
+              <option value="Medium">Medium (Madhyam)</option>
+              <option value="Large">Large (Bada)</option>
+              <option value="Jumbo">Jumbo</option>
+            </select>
+          </div>
+          <div class="sv-form-group">
+            <label class="sv-form-label">Quantity <small>(Kitne)</small></label>
+            <input type="number" class="sv-form-input" id="svRetQty" value="1" min="1">
+          </div>
+          <div class="sv-form-group">
+            <label class="sv-form-label">Deposit Refunded? <small>(Jama wapas?)</small></label>
+            <select class="sv-form-select" id="svRetDeposit">
+              <option value="No">No (Nahi)</option>
+              <option value="Yes">Yes (Haan)</option>
+            </select>
+          </div>
+          <button class="sv-form-submit green" onclick="svSubmitReturn()">WAPAS KARO &#10003;</button>
+        </div>
+      </div>
+
+      <!-- Today's Summary -->
+      <div class="sv-form" id="svSummary">
+        <div class="sv-form-card">
+          <button class="sv-back" onclick="svShowSection('main')">&#8592; Wapas</button>
+          <div class="sv-form-title">Aaj Ka Hisaab / Today's Summary</div>
+          <div class="sv-summary-grid" id="svSummaryGrid"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- ════════ ADD CUSTOMER MODAL ════════ -->
+<div class="modal-overlay" id="customerModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Add Customer</span>
+      <button class="modal-close" onclick="closeModal('customerModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Customer Name *</label>
+        <input type="text" class="form-input" id="custName" placeholder="e.g. City Hospital">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone *</label>
+        <input type="tel" class="form-input" id="custPhone" placeholder="e.g. 9876543210">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Customer Type</label>
+        <select class="form-select" id="custType">
+          <option value="Hospital">Hospital</option>
+          <option value="Industrial">Industrial</option>
+          <option value="Retail">Retail</option>
+          <option value="Laboratory">Laboratory</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Account Type</label>
+        <select class="form-select" id="custAccount">
+          <option value="Cash">Cash</option>
+          <option value="Credit">Credit</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Security Deposit (&#8377;)</label>
+        <input type="number" class="form-input" id="custDeposit" placeholder="0" value="0">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('customerModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="addCustomer()">Add Customer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ DELIVERY / RETURN MODAL ════════ -->
+<div class="modal-overlay" id="deliveryModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="delModalTitle">Log Delivery</span>
+      <button class="modal-close" onclick="closeModal('deliveryModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Customer *</label>
+        <select class="form-select" id="delCustomer"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input type="date" class="form-input" id="delDate">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Gas Type</label>
+        <select class="form-select" id="delGasType">
+          <option value="Oxygen">Oxygen</option>
+          <option value="Nitrogen">Nitrogen</option>
+          <option value="Argon">Argon</option>
+          <option value="CO2">CO2</option>
+          <option value="Acetylene">Acetylene</option>
+          <option value="LPG">LPG</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Quantity (Cylinders) *</label>
+        <input type="number" class="form-input" id="delQty" placeholder="1" min="1" value="1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Amount (&#8377;)</label>
+        <input type="number" class="form-input" id="delAmount" placeholder="0" value="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Payment Status</label>
+        <select class="form-select" id="delPayStatus">
+          <option value="Paid">Paid</option>
+          <option value="Unpaid">Unpaid</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('deliveryModal')">Cancel</button>
+      <button class="btn btn-primary" id="delSubmitBtn" onclick="addDelivery()">Log Delivery</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Data Store (localStorage backed) ──
+const STORAGE_KEY = 'usha_business_data';
+let data = loadData();
+
+function defaultData() {
+  return {
+    customers: [
+      { id: 1, name: 'City General Hospital', phone: '9876543210', type: 'Hospital', account: 'Credit', deposit: 15000, cylindersOut: 8, outstanding: 4200 },
+      { id: 2, name: 'Sharma Welding Works', phone: '9123456789', type: 'Industrial', account: 'Cash', deposit: 5000, cylindersOut: 3, outstanding: 0 },
+      { id: 3, name: 'Patel Gas Agency', phone: '9988776655', type: 'Retail', account: 'Credit', deposit: 10000, cylindersOut: 5, outstanding: 1800 }
+    ],
+    deliveries: [
+      { id: 1, customerId: 1, customerName: 'City General Hospital', date: '2026-03-07', type: 'Delivery', gasType: 'Oxygen', qty: 5, amount: 3500, payStatus: 'Unpaid' },
+      { id: 2, customerId: 2, customerName: 'Sharma Welding Works', date: '2026-03-06', type: 'Delivery', gasType: 'Acetylene', qty: 3, amount: 2400, payStatus: 'Paid' },
+      { id: 3, customerId: 3, customerName: 'Patel Gas Agency', date: '2026-03-05', type: 'Delivery', gasType: 'Oxygen', qty: 10, amount: 7000, payStatus: 'Paid' },
+      { id: 4, customerId: 3, customerName: 'Patel Gas Agency', date: '2026-03-07', type: 'Return', gasType: 'Oxygen', qty: 5, amount: 0, payStatus: 'Paid' },
+      { id: 5, customerId: 1, customerName: 'City General Hospital', date: '2026-03-08', type: 'Delivery', gasType: 'Nitrogen', qty: 3, amount: 2100, payStatus: 'Unpaid' }
+    ],
+    nextCustId: 4,
+    nextDelId: 6
+  };
+}
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  const d = defaultData();
+  saveData(d);
+  return d;
+}
+
+function saveData(d) {
+  d = d || data;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+}
+
+// ── Tab Navigation ──
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// ── Header Date ──
+document.getElementById('headerDate').textContent = new Date().toLocaleDateString('en-IN', {
+  weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
+});
+
+// ── Modal Helpers ──
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(ov => {
+  ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('open'); });
+});
+
+// ── Dashboard ──
+function updateDashboard() {
+  let cylOut = 0, deposits = 0, outstanding = 0;
+  data.customers.forEach(c => {
+    cylOut += c.cylindersOut;
+    deposits += c.deposit;
+    outstanding += c.outstanding;
+  });
+  document.getElementById('statCylOut').textContent = cylOut;
+  document.getElementById('statDeposits').innerHTML = '&#8377;' + deposits.toLocaleString('en-IN');
+  document.getElementById('statOutstanding').innerHTML = '&#8377;' + outstanding.toLocaleString('en-IN');
+  document.getElementById('statCustomers').textContent = data.customers.length;
+
+  // Recent activity
+  const container = document.getElementById('recentActivity');
+  const recent = [...data.deliveries].sort((a, b) => b.id - a.id).slice(0, 8);
+  if (recent.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128203;</div><p>Activity will appear here</p></div>';
+    return;
+  }
+  container.innerHTML = recent.map(d => {
+    const dotClass = d.type === 'Delivery' ? 'blue' : 'green';
+    const icon = d.type === 'Delivery' ? '&#128666;' : '&#8617;';
+    const amtStr = d.amount > 0 ? ' — &#8377;' + d.amount.toLocaleString('en-IN') : '';
+    return `<div class="activity-item">
+      <div class="activity-dot ${dotClass}"></div>
+      <div>
+        <div class="activity-text">${icon} ${d.type}: ${d.qty} x ${d.gasType} to <strong>${d.customerName}</strong>${amtStr}</div>
+        <div class="activity-time">${d.date}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Customers Table ──
+function renderCustomers() {
+  const search = document.getElementById('custSearch').value.toLowerCase();
+  const fType = document.getElementById('custFilterType').value;
+  const fAccount = document.getElementById('custFilterAccount').value;
+
+  let filtered = data.customers.filter(c => {
+    if (search && !c.name.toLowerCase().includes(search) && !c.phone.includes(search)) return false;
+    if (fType && c.type !== fType) return false;
+    if (fAccount && c.account !== fAccount) return false;
+    return true;
+  });
+
+  const tbody = document.getElementById('custTableBody');
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>No customers found</p></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map(c => {
+    const typeBadge = { Hospital: 'badge-blue', Industrial: 'badge-orange', Retail: 'badge-green', Laboratory: 'badge-purple' }[c.type] || 'badge-gray';
+    const acctBadge = c.account === 'Credit' ? 'badge-orange' : 'badge-green';
+    return `<tr>
+      <td><strong>${esc(c.name)}</strong></td>
+      <td>${esc(c.phone)}</td>
+      <td><span class="badge ${typeBadge}">${c.type}</span></td>
+      <td><span class="badge ${acctBadge}">${c.account}</span></td>
+      <td>${c.cylindersOut}</td>
+      <td>&#8377;${c.deposit.toLocaleString('en-IN')}</td>
+      <td>${c.outstanding > 0 ? '<span class="badge badge-red">&#8377;' + c.outstanding.toLocaleString('en-IN') + '</span>' : '<span class="badge badge-green">Clear</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function addCustomer() {
+  const name = document.getElementById('custName').value.trim();
+  const phone = document.getElementById('custPhone').value.trim();
+  if (!name || !phone) { alert('Name and Phone are required.'); return; }
+
+  data.customers.push({
+    id: data.nextCustId++,
+    name,
+    phone,
+    type: document.getElementById('custType').value,
+    account: document.getElementById('custAccount').value,
+    deposit: parseInt(document.getElementById('custDeposit').value) || 0,
+    cylindersOut: 0,
+    outstanding: 0
+  });
+  saveData();
+  closeModal('customerModal');
+  document.getElementById('custName').value = '';
+  document.getElementById('custPhone').value = '';
+  document.getElementById('custDeposit').value = '0';
+  renderCustomers();
+  updateDashboard();
+}
+
+// ── Deliveries ──
+let currentDeliveryType = 'Delivery';
+
+function openDeliveryModal(type) {
+  currentDeliveryType = type === 'return' ? 'Return' : 'Delivery';
+  document.getElementById('delModalTitle').textContent = type === 'return' ? 'Log Return' : 'Log Delivery';
+  document.getElementById('delSubmitBtn').textContent = type === 'return' ? 'Log Return' : 'Log Delivery';
+  document.getElementById('delSubmitBtn').className = type === 'return' ? 'btn btn-success' : 'btn btn-primary';
+  document.getElementById('delDate').value = new Date().toISOString().slice(0, 10);
+
+  // Populate customer dropdown
+  const sel = document.getElementById('delCustomer');
+  sel.innerHTML = data.customers.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+
+  openModal('deliveryModal');
+}
+
+function renderDeliveries() {
+  const search = document.getElementById('delSearch').value.toLowerCase();
+  const fType = document.getElementById('delFilterType').value;
+
+  let filtered = [...data.deliveries].sort((a, b) => b.id - a.id).filter(d => {
+    if (search && !d.customerName.toLowerCase().includes(search) && !d.gasType.toLowerCase().includes(search)) return false;
+    if (fType && d.type !== fType) return false;
+    return true;
+  });
+
+  const tbody = document.getElementById('delTableBody');
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>No deliveries found</p></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map(d => {
+    const typeBadge = d.type === 'Delivery' ? 'badge-blue' : 'badge-green';
+    const payBadge = d.payStatus === 'Paid' ? 'badge-green' : 'badge-red';
+    return `<tr>
+      <td>${d.date}</td>
+      <td><strong>${esc(d.customerName)}</strong></td>
+      <td><span class="badge ${typeBadge}">${d.type}</span></td>
+      <td>${d.qty}</td>
+      <td>${d.gasType}</td>
+      <td>&#8377;${d.amount.toLocaleString('en-IN')}</td>
+      <td><span class="badge ${payBadge}">${d.payStatus}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function addDelivery() {
+  const custId = parseInt(document.getElementById('delCustomer').value);
+  const qty = parseInt(document.getElementById('delQty').value) || 0;
+  if (!custId || qty < 1) { alert('Select a customer and enter valid quantity.'); return; }
+
+  const cust = data.customers.find(c => c.id === custId);
+  if (!cust) { alert('Customer not found.'); return; }
+
+  const amount = parseInt(document.getElementById('delAmount').value) || 0;
+  const payStatus = document.getElementById('delPayStatus').value;
+
+  data.deliveries.push({
+    id: data.nextDelId++,
+    customerId: custId,
+    customerName: cust.name,
+    date: document.getElementById('delDate').value,
+    type: currentDeliveryType,
+    gasType: document.getElementById('delGasType').value,
+    qty,
+    amount,
+    payStatus
+  });
+
+  // Update customer cylinder count and outstanding
+  if (currentDeliveryType === 'Delivery') {
+    cust.cylindersOut += qty;
+    if (payStatus === 'Unpaid') cust.outstanding += amount;
+  } else {
+    cust.cylindersOut = Math.max(0, cust.cylindersOut - qty);
+  }
+
+  saveData();
+  closeModal('deliveryModal');
+  document.getElementById('delQty').value = '1';
+  document.getElementById('delAmount').value = '0';
+  renderDeliveries();
+  updateDashboard();
+}
+
+// ── Util ──
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+// ══════════════════════════════════════
+// SUPERVISOR — Rajneesh functions
+// ══════════════════════════════════════
+
+function svShowSection(section) {
+  document.getElementById('svMainActions').classList.toggle('hidden', section !== 'main');
+  document.getElementById('svDeliverForm').classList.toggle('visible', section === 'deliver');
+  document.getElementById('svReturnForm').classList.toggle('visible', section === 'return');
+  document.getElementById('svSummary').classList.toggle('visible', section === 'summary');
+  document.getElementById('svSuccess').classList.remove('show');
+
+  if (section === 'deliver') {
+    svPopulateCustomers('svDelCust');
+    document.getElementById('svDelQty').value = '1';
+    document.getElementById('svDelAmount').value = '0';
+  } else if (section === 'return') {
+    svPopulateCustomers('svRetCust');
+    document.getElementById('svRetQty').value = '1';
+  } else if (section === 'summary') {
+    svRenderSummary();
+  }
+}
+
+function svPopulateCustomers(selectId) {
+  const sel = document.getElementById(selectId);
+  sel.innerHTML = data.customers.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+}
+
+function svShowSuccess(msg) {
+  const el = document.getElementById('svSuccess');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+function svSubmitDelivery() {
+  const custId = parseInt(document.getElementById('svDelCust').value);
+  const qty = parseInt(document.getElementById('svDelQty').value) || 0;
+  if (!custId || qty < 1) { alert('Customer aur quantity daalo!'); return; }
+
+  const cust = data.customers.find(c => c.id === custId);
+  if (!cust) return;
+
+  const amount = parseInt(document.getElementById('svDelAmount').value) || 0;
+  const paymentMode = document.getElementById('svDelPayMode').value;
+
+  data.deliveries.push({
+    id: data.nextDelId++,
+    customerId: custId,
+    customerName: cust.name,
+    date: new Date().toISOString().slice(0, 10),
+    type: 'Delivery',
+    gasType: document.getElementById('svDelGas').value,
+    cylinderSize: document.getElementById('svDelSize').value,
+    qty,
+    amount,
+    payStatus: amount > 0 ? 'Paid' : 'Unpaid',
+    paymentMode
+  });
+
+  cust.cylindersOut += qty;
+  if (amount === 0) cust.outstanding += 0;
+
+  saveData();
+  updateDashboard();
+  renderDeliveries();
+  svUpdateGreeting();
+  svShowSection('main');
+  svShowSuccess('Delivery ho gaya! ' + qty + ' cylinder ' + cust.name + ' ko diya');
+}
+
+function svSubmitReturn() {
+  const custId = parseInt(document.getElementById('svRetCust').value);
+  const qty = parseInt(document.getElementById('svRetQty').value) || 0;
+  if (!custId || qty < 1) { alert('Customer aur quantity daalo!'); return; }
+
+  const cust = data.customers.find(c => c.id === custId);
+  if (!cust) return;
+
+  const depositRefunded = document.getElementById('svRetDeposit').value === 'Yes';
+
+  data.deliveries.push({
+    id: data.nextDelId++,
+    customerId: custId,
+    customerName: cust.name,
+    date: new Date().toISOString().slice(0, 10),
+    type: 'Return',
+    gasType: '-',
+    cylinderSize: document.getElementById('svRetSize').value,
+    qty,
+    amount: 0,
+    payStatus: 'Paid',
+    paymentMode: '-'
+  });
+
+  cust.cylindersOut = Math.max(0, cust.cylindersOut - qty);
+  if (depositRefunded) cust.deposit = Math.max(0, cust.deposit - 0); // deposit amount unknown per cylinder, keep as-is
+
+  saveData();
+  updateDashboard();
+  renderDeliveries();
+  svUpdateGreeting();
+  svShowSection('main');
+  svShowSuccess('Wapas le liya! ' + qty + ' cylinder ' + cust.name + ' se');
+}
+
+function svRenderSummary() {
+  const today = new Date().toISOString().slice(0, 10);
+  const todayDels = data.deliveries.filter(d => d.date === today);
+
+  let cylDelivered = 0, cashCollected = 0, upiCollected = 0, cylReturned = 0;
+  todayDels.forEach(d => {
+    if (d.type === 'Delivery') {
+      cylDelivered += d.qty;
+      if (d.paymentMode === 'UPI') upiCollected += d.amount;
+      else cashCollected += d.amount; // Cash or legacy entries without paymentMode
+    } else {
+      cylReturned += d.qty;
+    }
+  });
+
+  document.getElementById('svSummaryGrid').innerHTML = `
+    <div class="sv-stat-card blue">
+      <div class="sv-stat-icon">&#128666;</div>
+      <div class="sv-stat-info">
+        <div class="sv-stat-label">Cylinder Diye (Delivered)</div>
+        <div class="sv-stat-value">${cylDelivered}</div>
+      </div>
+    </div>
+    <div class="sv-stat-card green">
+      <div class="sv-stat-icon">&#128181;</div>
+      <div class="sv-stat-info">
+        <div class="sv-stat-label">Cash Liya (Cash Collected)</div>
+        <div class="sv-stat-value">&#8377;${cashCollected.toLocaleString('en-IN')}</div>
+      </div>
+    </div>
+    <div class="sv-stat-card purple">
+      <div class="sv-stat-icon">&#128241;</div>
+      <div class="sv-stat-info">
+        <div class="sv-stat-label">UPI Liya (UPI Collected)</div>
+        <div class="sv-stat-value">&#8377;${upiCollected.toLocaleString('en-IN')}</div>
+      </div>
+    </div>
+    <div class="sv-stat-card orange">
+      <div class="sv-stat-icon">&#8617;</div>
+      <div class="sv-stat-info">
+        <div class="sv-stat-label">Wapas Liye (Returned)</div>
+        <div class="sv-stat-value">${cylReturned}</div>
+      </div>
+    </div>
+  `;
+}
+
+function svUpdateGreeting() {
+  const now = new Date();
+  const hindiDays = ['Ravivar', 'Somvar', 'Mangalvar', 'Budhvar', 'Guruvar', 'Shukravar', 'Shanivar'];
+  const hindiMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const dateStr = now.getDate() + ' ' + hindiMonths[now.getMonth()] + ' ' + now.getFullYear() + ', ' + hindiDays[now.getDay()];
+  document.getElementById('svDate').textContent = dateStr;
+
+  const today = now.toISOString().slice(0, 10);
+  const todayDeliveries = data.deliveries.filter(d => d.date === today && d.type === 'Delivery').length;
+  document.getElementById('svPending').textContent = 'Aaj ' + todayDeliveries + ' deliveries hui hain';
+}
+
+// ── Init ──
+updateDashboard();
+renderCustomers();
+renderDeliveries();
+svUpdateGreeting();
+</script>
+</body>
+</html>
