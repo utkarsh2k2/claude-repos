@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Usha Worker">
+  <meta name="theme-color" content="#16a34a">
+  <title>Usha Gases — Worker</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f1f5f9; color: #1e293b; min-height: 100vh;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ── Offline Bar ── */
+    .offline-bar {
+      display: none; background: #ef4444; color: white; text-align: center;
+      padding: 10px; font-weight: 700; font-size: 14px;
+      position: sticky; top: 0; z-index: 200;
+    }
+    .offline-bar.show { display: block; }
+
+    /* ── Login Screen ── */
+    .login-screen {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 24px;
+      background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
+    }
+    .login-logo { font-size: 48px; margin-bottom: 12px; }
+    .login-title { color: white; font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+    .login-sub { color: rgba(255,255,255,0.8); font-size: 14px; margin-bottom: 32px; }
+    .login-card {
+      background: white; border-radius: 20px; padding: 28px; width: 100%;
+      max-width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .login-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; text-align: center; }
+    .login-input {
+      width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px;
+      font-size: 18px; text-align: center; letter-spacing: 12px; font-weight: 700;
+      outline: none; margin-bottom: 14px;
+    }
+    .login-input:focus { border-color: #16a34a; }
+    .login-input.name { letter-spacing: normal; text-align: left; font-size: 16px; }
+    .login-btn {
+      width: 100%; padding: 14px; border: none; border-radius: 12px;
+      font-size: 17px; font-weight: 700; color: white; cursor: pointer;
+      background: #16a34a; margin-top: 8px;
+    }
+    .login-btn:active { transform: scale(0.97); }
+    .login-toggle { text-align: center; margin-top: 16px; font-size: 14px; color: #64748b; }
+    .login-toggle a { color: #16a34a; font-weight: 600; cursor: pointer; text-decoration: none; }
+    .login-error {
+      background: #fee2e2; color: #dc2626; padding: 10px; border-radius: 8px;
+      font-size: 13px; font-weight: 600; text-align: center; margin-bottom: 12px; display: none;
+    }
+    .login-error.show { display: block; }
+    .login-waiting {
+      background: #fef3c7; color: #b45309; padding: 16px; border-radius: 12px;
+      font-size: 15px; font-weight: 600; text-align: center; display: none;
+    }
+    .login-waiting.show { display: block; }
+
+    /* ── App ── */
+    .app { display: none; }
+    .app.active { display: block; }
+    .app-container { max-width: 480px; margin: 0 auto; padding: 16px; }
+
+    /* ── Header ── */
+    .wk-header {
+      background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
+      color: white; border-radius: 16px; padding: 18px 20px;
+      margin-bottom: 16px; box-shadow: 0 4px 15px rgba(22,163,74,0.3);
+    }
+    .wk-header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .wk-header-hello { font-size: 22px; font-weight: 800; }
+    .wk-header-date { font-size: 13px; opacity: 0.85; margin-top: 3px; }
+    .wk-header-logout {
+      background: rgba(255,255,255,0.25); border: none; color: white;
+      padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    .wk-header-count {
+      margin-top: 12px; padding: 10px 14px; background: rgba(255,255,255,0.2);
+      border-radius: 10px; font-size: 15px; font-weight: 600;
+    }
+
+    /* ── Delivery Cards ── */
+    .wk-card {
+      background: white; border-radius: 16px; padding: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 14px;
+      border-left: 5px solid #1d4ed8; transition: opacity 0.3s;
+    }
+    .wk-card.delivered { border-color: #16a34a; background: #f0fdf4; }
+    .wk-card.returned { border-color: #94a3b8; background: #f8fafc; opacity: 0.7; }
+    .wk-card-customer { font-size: 18px; font-weight: 800; color: #0f172a; }
+    .wk-card-address { font-size: 13px; color: #64748b; margin-top: 3px; }
+    .wk-card-cylinder {
+      margin-top: 10px; padding: 10px 14px; background: #f1f5f9;
+      border-radius: 10px; font-size: 15px; font-weight: 700; color: #374151;
+    }
+    .wk-card-status {
+      margin-top: 8px; font-size: 13px; font-weight: 700; text-transform: uppercase;
+    }
+    .wk-card-status.pending { color: #1d4ed8; }
+    .wk-card-status.delivered { color: #16a34a; }
+    .wk-card-status.returned { color: #94a3b8; }
+    .wk-card-actions { display: flex; gap: 10px; margin-top: 12px; }
+    .wk-action-btn {
+      flex: 1; min-height: 52px; border: none; border-radius: 12px;
+      font-size: 15px; font-weight: 800; color: white; cursor: pointer;
+      transition: transform 0.1s;
+    }
+    .wk-action-btn:active { transform: scale(0.96); }
+    .wk-action-btn.deliver { background: #16a34a; }
+    .wk-action-btn.return-btn { background: #ea580c; }
+    .wk-action-btn:disabled { background: #cbd5e1; cursor: default; }
+    .wk-action-btn:disabled:active { transform: none; }
+
+    /* ── Empty State ── */
+    .wk-empty {
+      text-align: center; padding: 60px 20px; color: #94a3b8;
+    }
+    .wk-empty-icon { font-size: 56px; margin-bottom: 12px; }
+    .wk-empty p { font-size: 16px; font-weight: 600; }
+
+    /* ── Success Toast ── */
+    .wk-toast {
+      display: none; position: fixed; bottom: 24px; left: 16px; right: 16px;
+      background: #16a34a; color: white; padding: 16px; border-radius: 14px;
+      text-align: center; font-size: 16px; font-weight: 700; z-index: 100;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2); max-width: 480px; margin: 0 auto;
+    }
+    .wk-toast.show { display: block; animation: slideUp 0.3s ease; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Loading ── */
+    .loading { text-align: center; padding: 40px; color: #94a3b8; font-size: 16px; }
+    .spinner {
+      width: 32px; height: 32px; border: 3px solid #e2e8f0;
+      border-top: 3px solid #16a34a; border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<!-- ── Offline Bar ── -->
+<div class="offline-bar" id="offlineBar">&#9888; OFFLINE — Jab net aayega tab sync hoga</div>
+
+<!-- ══════════ LOGIN SCREEN ══════════ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-logo">&#9981;</div>
+  <div class="login-title">Usha Gases</div>
+  <div class="login-sub">Worker App</div>
+  <div class="login-card">
+    <!-- Login -->
+    <div id="loginForm">
+      <h3>PIN Daalo / Enter PIN</h3>
+      <div class="login-error" id="loginError"></div>
+      <div class="login-waiting" id="loginWaiting">&#9203; Approval pending hai. Supervisor se bolo approve kare.</div>
+      <input type="tel" class="login-input" id="loginPin" maxlength="4" placeholder="&#8226;&#8226;&#8226;&#8226;" inputmode="numeric" autocomplete="off">
+      <button class="login-btn" id="loginBtn">LOGIN</button>
+      <div class="login-toggle">Naya hai? <a id="showSetup">Pehli baar setup karo</a></div>
+    </div>
+    <!-- Setup -->
+    <div id="setupForm" style="display:none">
+      <h3>Pehli Baar Setup</h3>
+      <div class="login-error" id="setupError"></div>
+      <input type="text" class="login-input name" id="setupName" placeholder="Apna naam likho" autocomplete="off">
+      <input type="tel" class="login-input" id="setupPin" maxlength="4" placeholder="4-digit PIN banao" inputmode="numeric" autocomplete="off">
+      <button class="login-btn" id="setupBtn">SETUP KARO</button>
+      <div class="login-toggle"><a id="showLogin">PIN hai? Login karo</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MAIN APP ══════════ -->
+<div class="app" id="mainApp">
+  <div class="app-container">
+
+    <div class="wk-header">
+      <div class="wk-header-top">
+        <div>
+          <div class="wk-header-hello" id="wkHello">Namaste! &#x1F64F;</div>
+          <div class="wk-header-date" id="wkDate"></div>
+        </div>
+        <button class="wk-header-logout" id="logoutBtn">Logout</button>
+      </div>
+      <div class="wk-header-count" id="wkCount">Loading...</div>
+    </div>
+
+    <div id="deliveryList">
+      <div class="loading"><div class="spinner"></div>Loading deliveries...</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Success Toast ── -->
+<div class="wk-toast" id="wkToast"></div>
+
+<script type="module">
+// ══════════════════════════════════════
+// FIREBASE SETUP
+// ══════════════════════════════════════
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
+import {
+  initializeFirestore, persistentLocalCache, persistentSingleTabManager,
+  collection, doc, addDoc, getDoc, getDocs, updateDoc,
+  query, where, orderBy, onSnapshot, serverTimestamp, Timestamp, increment
+} from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+
+const app = initializeApp({
+  apiKey: "AIzaSyAXDo4KMjms_pclwIPPM2AjgeBrFBMnhVg",
+  authDomain: "usha-gases.firebaseapp.com",
+  projectId: "usha-gases",
+  storageBucket: "usha-gases.firebasestorage.app",
+  messagingSenderId: "577828579000",
+  appId: "1:577828579000:web:186defa22cdfea3dfc364d"
+});
+
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentSingleTabManager() })
+});
+
+// ══════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function todayStart() {
+  const d = new Date(); d.setHours(0,0,0,0);
+  return Timestamp.fromDate(d);
+}
+
+function hindiDate() {
+  const now = new Date();
+  const days = ['Ravivar','Somvar','Mangalvar','Budhvar','Guruvar','Shukravar','Shanivar'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear() + ', ' + days[now.getDay()];
+}
+
+async function hashPin(pin) {
+  const data = new TextEncoder().encode(pin);
+  const buf = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// ── Online/Offline ──
+function updateOnlineStatus() {
+  document.getElementById('offlineBar').classList.toggle('show', !navigator.onLine);
+}
+window.addEventListener('online', () => { updateOnlineStatus(); flushOfflineQueue(); });
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+
+// ══════════════════════════════════════
+// SESSION / AUTH
+// ══════════════════════════════════════
+const SESSION_KEY = 'usha_session';
+let session = null;
+
+function getSession() { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch(e) { return null; } }
+function saveSession(s) { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); session = s; }
+function clearSession() { localStorage.removeItem(SESSION_KEY); session = null; }
+
+const $loginScreen = document.getElementById('loginScreen');
+const $mainApp = document.getElementById('mainApp');
+
+document.getElementById('showSetup').addEventListener('click', () => {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('setupForm').style.display = 'block';
+});
+document.getElementById('showLogin').addEventListener('click', () => {
+  document.getElementById('setupForm').style.display = 'none';
+  document.getElementById('loginForm').style.display = 'block';
+});
+
+document.getElementById('loginBtn').addEventListener('click', async () => {
+  const pin = document.getElementById('loginPin').value.trim();
+  const errEl = document.getElementById('loginError');
+  const waitEl = document.getElementById('loginWaiting');
+  errEl.classList.remove('show'); waitEl.classList.remove('show');
+
+  if (pin.length !== 4) { errEl.textContent = 'PIN 4 digit ka hona chahiye!'; errEl.classList.add('show'); return; }
+  try {
+    const h = await hashPin(pin);
+    const q = query(collection(db, 'users'), where('pin','==',h), where('role','==','worker'));
+    const snap = await getDocs(q);
+    if (snap.empty) { errEl.textContent = 'Galat PIN! Dobara try karo.'; errEl.classList.add('show'); return; }
+    const userDoc = snap.docs[0];
+    const u = userDoc.data();
+    if (!u.approved) { waitEl.classList.add('show'); return; }
+    saveSession({ uid: userDoc.id, role: u.role, name: u.name, loginAt: Date.now() });
+    enterApp();
+  } catch(e) { errEl.textContent = 'Error: ' + e.message; errEl.classList.add('show'); }
+});
+
+document.getElementById('setupBtn').addEventListener('click', async () => {
+  const name = document.getElementById('setupName').value.trim();
+  const pin = document.getElementById('setupPin').value.trim();
+  const errEl = document.getElementById('setupError');
+  errEl.classList.remove('show');
+  if (!name) { errEl.textContent = 'Naam likho!'; errEl.classList.add('show'); return; }
+  if (pin.length !== 4) { errEl.textContent = 'PIN 4 digit ka hona chahiye!'; errEl.classList.add('show'); return; }
+  try {
+    const h = await hashPin(pin);
+    const docRef = await addDoc(collection(db, 'users'), {
+      name, role: 'worker', pin: h, approved: false, createdAt: serverTimestamp()
+    });
+    // Worker not approved yet — show waiting
+    document.getElementById('setupForm').style.display = 'none';
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('loginWaiting').classList.add('show');
+  } catch(e) { errEl.textContent = 'Error: ' + e.message; errEl.classList.add('show'); }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  if (unsubDeliveries) unsubDeliveries();
+  clearSession();
+  $mainApp.classList.remove('active');
+  $loginScreen.style.display = 'flex';
+  document.getElementById('loginPin').value = '';
+});
+
+function enterApp() {
+  $loginScreen.style.display = 'none';
+  $mainApp.classList.add('active');
+  document.getElementById('wkHello').innerHTML = 'Namaste ' + esc(session.name) + '! &#x1F64F;';
+  document.getElementById('wkDate').textContent = hindiDate();
+  startListeningDeliveries();
+}
+
+// Auto-login
+session = getSession();
+if (session && session.role === 'worker') { enterApp(); }
+
+// ══════════════════════════════════════
+// OFFLINE QUEUE
+// ══════════════════════════════════════
+const OFFLINE_Q_KEY = 'usha_worker_offline_queue';
+const CACHE_KEY = 'usha_worker_deliveries';
+
+function queueAction(action) {
+  const q = JSON.parse(localStorage.getItem(OFFLINE_Q_KEY) || '[]');
+  q.push({ ...action, queuedAt: Date.now() });
+  localStorage.setItem(OFFLINE_Q_KEY, JSON.stringify(q));
+}
+
+async function flushOfflineQueue() {
+  const q = JSON.parse(localStorage.getItem(OFFLINE_Q_KEY) || '[]');
+  if (q.length === 0) return;
+  const remaining = [];
+  for (const action of q) {
+    try {
+      if (action.type === 'update_status') {
+        await updateDoc(doc(db, 'deliveries', action.docId), {
+          status: action.status,
+          [action.tsField]: serverTimestamp(),
+          syncedAt: serverTimestamp()
+        });
+        // Update customer too
+        if (action.status === 'returned' && action.customerId) {
+          const custDoc = await getDoc(doc(db, 'customers', action.customerId));
+          if (custDoc.exists()) {
+            const newCyl = Math.max(0, (custDoc.data().cylindersOut || 0) - (action.qty || 0));
+            await updateDoc(doc(db, 'customers', action.customerId), { cylindersOut: newCyl });
+          }
+        }
+      }
+    } catch(e) {
+      remaining.push(action);
+    }
+  }
+  if (remaining.length > 0) localStorage.setItem(OFFLINE_Q_KEY, JSON.stringify(remaining));
+  else localStorage.removeItem(OFFLINE_Q_KEY);
+}
+
+function cacheDeliveries(deliveries) {
+  localStorage.setItem(CACHE_KEY, JSON.stringify(deliveries));
+}
+
+function loadCachedDeliveries() {
+  try { return JSON.parse(localStorage.getItem(CACHE_KEY) || '[]'); } catch(e) { return []; }
+}
+
+// ══════════════════════════════════════
+// DELIVERIES — Real-time Listener
+// ══════════════════════════════════════
+let unsubDeliveries = null;
+let deliveriesData = [];
+
+function startListeningDeliveries() {
+  if (!session) return;
+  const q = query(
+    collection(db, 'deliveries'),
+    where('assignedTo', '==', session.uid),
+    where('createdAt', '>=', todayStart())
+  );
+
+  unsubDeliveries = onSnapshot(q, (snap) => {
+    deliveriesData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    cacheDeliveries(deliveriesData);
+    renderDeliveries();
+  }, (err) => {
+    console.warn('onSnapshot error, using cache:', err);
+    deliveriesData = loadCachedDeliveries();
+    renderDeliveries();
+  });
+}
+
+function renderDeliveries() {
+  const container = document.getElementById('deliveryList');
+
+  // Sort: pending first, then delivered, then returned
+  const order = { pending: 0, delivered: 1, returned: 2 };
+  const sorted = [...deliveriesData].sort((a,b) => (order[a.status]||0) - (order[b.status]||0));
+
+  const pendingCount = sorted.filter(d => d.status === 'pending').length;
+  const totalCount = sorted.filter(d => d.status !== 'returned').length;
+  document.getElementById('wkCount').textContent = 'Aaj ke kaam: ' + totalCount + ' deliveries' + (pendingCount > 0 ? ' (' + pendingCount + ' pending)' : '');
+
+  if (sorted.length === 0) {
+    container.innerHTML = `<div class="wk-empty">
+      <div class="wk-empty-icon">&#128516;</div>
+      <p>Koi delivery nahi hai aaj!</p>
+      <p style="font-size:14px;margin-top:8px;font-weight:400">Jab supervisor assign karega tab yahan dikhega</p>
+    </div>`;
+    return;
+  }
+
+  container.innerHTML = sorted.map(d => {
+    const isPending = d.status === 'pending';
+    const isDelivered = d.status === 'delivered';
+    const isReturned = d.status === 'returned';
+
+    return `<div class="wk-card ${d.status}">
+      <div class="wk-card-customer">${esc(d.customerName || 'Customer')}</div>
+      ${d.customerAddress ? `<div class="wk-card-address">&#128205; ${esc(d.customerAddress)}</div>` : ''}
+      <div class="wk-card-cylinder">
+        ${esc(d.cylinderSize || '')} &#215; ${d.quantity || 0} &nbsp; ${esc(d.gasType || '')}
+      </div>
+      <div class="wk-card-status ${d.status}">${
+        isPending ? '&#9679; PENDING' : isDelivered ? '&#10003; DELIVERED' : '&#8617; RETURNED'
+      }</div>
+      <div class="wk-card-actions">
+        <button class="wk-action-btn deliver" ${!isPending ? 'disabled' : ''} onclick="markDelivered('${d.id}')">
+          DELIVER KIYA &#10003;
+        </button>
+        <button class="wk-action-btn return-btn" ${isReturned || isPending ? 'disabled' : ''} onclick="markReturned('${d.id}','${d.customerId}',${d.quantity||0})">
+          WAPAS LIYA &#8617;
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+// ACTIONS — Deliver / Return
+// ══════════════════════════════════════
+function showToast(msg) {
+  const el = document.getElementById('wkToast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+window.markDelivered = async function(delId) {
+  // Optimistic local update
+  const item = deliveriesData.find(d => d.id === delId);
+  if (item) { item.status = 'delivered'; renderDeliveries(); }
+
+  if (navigator.onLine) {
+    try {
+      await updateDoc(doc(db, 'deliveries', delId), {
+        status: 'delivered', deliveredAt: serverTimestamp(), syncedAt: serverTimestamp()
+      });
+    } catch(e) {
+      queueAction({ type: 'update_status', docId: delId, status: 'delivered', tsField: 'deliveredAt' });
+    }
+  } else {
+    queueAction({ type: 'update_status', docId: delId, status: 'delivered', tsField: 'deliveredAt' });
+  }
+  showToast('Deliver ho gaya! &#10003;');
+};
+
+window.markReturned = async function(delId, customerId, qty) {
+  // Optimistic local update
+  const item = deliveriesData.find(d => d.id === delId);
+  if (item) { item.status = 'returned'; renderDeliveries(); }
+
+  if (navigator.onLine) {
+    try {
+      await updateDoc(doc(db, 'deliveries', delId), {
+        status: 'returned', returnedAt: serverTimestamp(), syncedAt: serverTimestamp()
+      });
+      if (customerId) {
+        const custDoc = await getDoc(doc(db, 'customers', customerId));
+        if (custDoc.exists()) {
+          const newCyl = Math.max(0, (custDoc.data().cylindersOut || 0) - qty);
+          await updateDoc(doc(db, 'customers', customerId), { cylindersOut: newCyl });
+        }
+      }
+    } catch(e) {
+      queueAction({ type: 'update_status', docId: delId, status: 'returned', tsField: 'returnedAt', customerId, qty });
+    }
+  } else {
+    queueAction({ type: 'update_status', docId: delId, status: 'returned', tsField: 'returnedAt', customerId, qty });
+  }
+  showToast('Wapas le liya! &#8617;');
+};
+
+// ══════════════════════════════════════
+// PWA
+// ══════════════════════════════════════
+const manifest = {
+  name: "Usha Gases - Worker",
+  short_name: "Worker",
+  start_url: "./worker-app.html",
+  display: "standalone",
+  background_color: "#15803d",
+  theme_color: "#16a34a",
+  icons: [{
+    src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>⛽</text></svg>",
+    sizes: "any", type: "image/svg+xml"
+  }]
+};
+const mBlob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+const mLink = document.createElement('link');
+mLink.rel = 'manifest'; mLink.href = URL.createObjectURL(mBlob);
+document.head.appendChild(mLink);
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('worker-sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>

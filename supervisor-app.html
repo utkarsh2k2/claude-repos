@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Usha Supervisor">
+  <meta name="theme-color" content="#ea580c">
+  <title>Usha Gases — Supervisor</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f1f5f9; color: #1e293b; min-height: 100vh;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ── Offline Bar ── */
+    .offline-bar {
+      display: none; background: #ef4444; color: white; text-align: center;
+      padding: 8px; font-weight: 700; font-size: 13px;
+      position: sticky; top: 0; z-index: 200;
+    }
+    .offline-bar.show { display: block; }
+
+    /* ── Login Screen ── */
+    .login-screen {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 24px;
+      background: linear-gradient(135deg, #ea580c 0%, #f59e0b 100%);
+    }
+    .login-logo { font-size: 48px; margin-bottom: 12px; }
+    .login-title { color: white; font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+    .login-sub { color: rgba(255,255,255,0.8); font-size: 14px; margin-bottom: 32px; }
+    .login-card {
+      background: white; border-radius: 20px; padding: 28px; width: 100%;
+      max-width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .login-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; text-align: center; }
+    .login-input {
+      width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px;
+      font-size: 18px; text-align: center; letter-spacing: 12px; font-weight: 700;
+      outline: none; margin-bottom: 14px;
+    }
+    .login-input:focus { border-color: #ea580c; }
+    .login-input.name { letter-spacing: normal; text-align: left; font-size: 16px; }
+    .login-btn {
+      width: 100%; padding: 14px; border: none; border-radius: 12px;
+      font-size: 17px; font-weight: 700; color: white; cursor: pointer;
+      background: #ea580c; margin-top: 8px;
+    }
+    .login-btn:active { transform: scale(0.97); }
+    .login-toggle {
+      text-align: center; margin-top: 16px; font-size: 14px; color: #64748b;
+    }
+    .login-toggle a {
+      color: #ea580c; font-weight: 600; cursor: pointer; text-decoration: none;
+    }
+    .login-error {
+      background: #fee2e2; color: #dc2626; padding: 10px; border-radius: 8px;
+      font-size: 13px; font-weight: 600; text-align: center; margin-bottom: 12px;
+      display: none;
+    }
+    .login-error.show { display: block; }
+
+    /* ── App Container ── */
+    .app { display: none; }
+    .app.active { display: block; }
+    .app-container { max-width: 480px; margin: 0 auto; padding: 16px; }
+
+    /* ── Greeting ── */
+    .sv-greeting {
+      background: linear-gradient(135deg, #ea580c 0%, #f59e0b 100%);
+      color: white; border-radius: 16px; padding: 22px 20px;
+      margin-bottom: 20px; box-shadow: 0 4px 15px rgba(234,88,12,0.3);
+    }
+    .sv-greeting-hello { font-size: 26px; font-weight: 800; }
+    .sv-greeting-date { font-size: 14px; opacity: 0.9; margin-top: 4px; }
+    .sv-greeting-pending {
+      margin-top: 12px; padding: 10px 14px; background: rgba(255,255,255,0.2);
+      border-radius: 10px; font-size: 15px; font-weight: 600;
+    }
+    .sv-greeting-logout {
+      background: rgba(255,255,255,0.25); border: none; color: white;
+      padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+      cursor: pointer; float: right; margin-top: -4px;
+    }
+
+    /* ── Action Buttons ── */
+    .sv-actions { display: flex; flex-direction: column; gap: 12px; }
+    .sv-actions.hidden { display: none; }
+    .sv-btn {
+      width: 100%; min-height: 66px; border: none; border-radius: 16px;
+      font-size: 20px; font-weight: 800; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 2px; padding: 14px 20px;
+      transition: transform 0.1s; box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+      color: white;
+    }
+    .sv-btn:active { transform: scale(0.97); }
+    .sv-btn-sub { font-size: 12px; font-weight: 500; opacity: 0.85; }
+    .sv-btn.blue   { background: #1d4ed8; }
+    .sv-btn.green  { background: #16a34a; }
+    .sv-btn.orange { background: #ea580c; }
+    .sv-btn.purple { background: #7c3aed; }
+
+    /* ── Forms ── */
+    .sv-form { display: none; }
+    .sv-form.visible { display: block; }
+    .sv-form-card {
+      background: white; border-radius: 16px; padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    .sv-back {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: none; border: none; font-size: 15px; font-weight: 600;
+      color: #64748b; cursor: pointer; padding: 0; margin-bottom: 14px;
+    }
+    .sv-form-title { font-size: 20px; font-weight: 800; color: #1e293b; margin-bottom: 18px; }
+    .sv-form-group { margin-bottom: 16px; }
+    .sv-form-label {
+      display: block; font-size: 14px; font-weight: 700;
+      color: #374151; margin-bottom: 6px;
+    }
+    .sv-form-label small { font-weight: 500; color: #64748b; }
+    .sv-form-input, .sv-form-select {
+      width: 100%; padding: 14px; border: 2px solid #e2e8f0;
+      border-radius: 12px; font-size: 16px; outline: none;
+      transition: border-color 0.15s; background: white;
+    }
+    .sv-form-input:focus, .sv-form-select:focus { border-color: #ea580c; }
+    .sv-form-submit {
+      width: 100%; min-height: 56px; border: none; border-radius: 14px;
+      font-size: 18px; font-weight: 800; color: white; cursor: pointer;
+      margin-top: 8px; transition: transform 0.1s;
+    }
+    .sv-form-submit:active { transform: scale(0.97); }
+    .sv-form-submit.blue  { background: #1d4ed8; }
+    .sv-form-submit.green { background: #16a34a; }
+    .sv-form-submit.orange { background: #ea580c; }
+
+    /* ── Success Toast ── */
+    .sv-success {
+      display: none; background: #dcfce7; color: #15803d;
+      border-radius: 12px; padding: 16px; text-align: center;
+      font-size: 16px; font-weight: 700; margin-bottom: 16px;
+    }
+    .sv-success.show { display: block; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Summary Cards ── */
+    .sv-summary-grid { display: flex; flex-direction: column; gap: 12px; }
+    .sv-stat-card {
+      display: flex; align-items: center; gap: 14px;
+      background: #fff; border-radius: 14px; padding: 18px 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-left: 5px solid;
+    }
+    .sv-stat-card.blue   { border-color: #1d4ed8; }
+    .sv-stat-card.green  { border-color: #16a34a; }
+    .sv-stat-card.orange { border-color: #ea580c; }
+    .sv-stat-card.purple { border-color: #7c3aed; }
+    .sv-stat-icon { font-size: 28px; }
+    .sv-stat-info { flex: 1; }
+    .sv-stat-label { font-size: 13px; color: #64748b; font-weight: 600; }
+    .sv-stat-value { font-size: 26px; font-weight: 800; color: #0f172a; }
+
+    /* ── Worker Cards ── */
+    .worker-card {
+      background: white; border-radius: 14px; padding: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin-bottom: 10px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .worker-name { font-size: 16px; font-weight: 700; }
+    .worker-status { font-size: 12px; color: #64748b; margin-top: 2px; }
+    .worker-approve-btn {
+      padding: 8px 16px; border: none; border-radius: 10px;
+      background: #16a34a; color: white; font-size: 14px; font-weight: 700;
+      cursor: pointer;
+    }
+    .worker-count {
+      font-size: 14px; font-weight: 700; color: #1d4ed8;
+      background: #dbeafe; padding: 6px 12px; border-radius: 8px;
+    }
+
+    /* ── Payment Cards ── */
+    .payment-card {
+      background: white; border-radius: 14px; padding: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin-bottom: 10px;
+      border-left: 4px solid #dc2626;
+    }
+    .payment-cust-name { font-size: 16px; font-weight: 700; }
+    .payment-amount { font-size: 22px; font-weight: 800; color: #dc2626; margin-top: 4px; }
+    .payment-form { margin-top: 12px; display: none; }
+    .payment-form.show { display: block; }
+    .payment-row { display: flex; gap: 8px; margin-top: 8px; }
+    .payment-row .sv-form-input { flex: 1; }
+    .payment-row .sv-form-select { width: 110px; flex: none; }
+
+    /* ── Loading ── */
+    .loading { text-align: center; padding: 40px; color: #94a3b8; font-size: 16px; }
+    .spinner {
+      width: 32px; height: 32px; border: 3px solid #e2e8f0;
+      border-top: 3px solid #ea580c; border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<!-- ── Offline Bar ── -->
+<div class="offline-bar" id="offlineBar">&#9888; OFFLINE — Changes will sync when connected</div>
+
+<!-- ══════════ LOGIN SCREEN ══════════ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-logo">&#9981;</div>
+  <div class="login-title">Usha Gases</div>
+  <div class="login-sub">Supervisor App</div>
+  <div class="login-card">
+    <!-- Login Form -->
+    <div id="loginForm">
+      <h3>PIN Daalo / Enter PIN</h3>
+      <div class="login-error" id="loginError"></div>
+      <input type="tel" class="login-input" id="loginPin" maxlength="4" placeholder="&#8226;&#8226;&#8226;&#8226;" inputmode="numeric" autocomplete="off">
+      <button class="login-btn" id="loginBtn">LOGIN</button>
+      <div class="login-toggle">Naya hai? <a id="showSetup">Pehli baar setup karo</a></div>
+    </div>
+    <!-- Setup Form -->
+    <div id="setupForm" style="display:none">
+      <h3>Pehli Baar Setup</h3>
+      <div class="login-error" id="setupError"></div>
+      <input type="text" class="login-input name" id="setupName" placeholder="Apna naam likho" autocomplete="off">
+      <input type="tel" class="login-input" id="setupPin" maxlength="4" placeholder="4-digit PIN banao" inputmode="numeric" autocomplete="off">
+      <button class="login-btn" id="setupBtn">SETUP KARO</button>
+      <div class="login-toggle"><a id="showLogin">PIN hai? Login karo</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MAIN APP ══════════ -->
+<div class="app" id="mainApp">
+  <div class="app-container">
+
+    <div class="sv-greeting">
+      <button class="sv-greeting-logout" id="logoutBtn">Logout</button>
+      <div class="sv-greeting-hello" id="greetHello">Namaste! &#x1F64F;</div>
+      <div class="sv-greeting-date" id="greetDate"></div>
+      <div class="sv-greeting-pending" id="greetPending">Loading...</div>
+    </div>
+
+    <div id="svSuccess" class="sv-success"></div>
+
+    <!-- Main Action Buttons -->
+    <div class="sv-actions" id="svMainActions">
+      <button class="sv-btn blue" onclick="showSection('deliver')">
+        CYLINDER DO<span class="sv-btn-sub">Deliver Cylinder</span>
+      </button>
+      <button class="sv-btn green" onclick="showSection('return')">
+        WAPAS LO<span class="sv-btn-sub">Return Cylinder</span>
+      </button>
+      <button class="sv-btn orange" onclick="showSection('payments')">
+        PAYMENTS<span class="sv-btn-sub">Baaki Paisa / Outstanding</span>
+      </button>
+      <button class="sv-btn purple" onclick="showSection('workers')">
+        WORKERS<span class="sv-btn-sub">Kaamgar / Staff</span>
+      </button>
+      <button class="sv-btn orange" onclick="showSection('summary')">
+        AAJ KA HISAAB<span class="sv-btn-sub">Today's Summary</span>
+      </button>
+    </div>
+
+    <!-- ── CYLINDER DO Form ── -->
+    <div class="sv-form" id="secDeliver">
+      <div class="sv-form-card">
+        <button class="sv-back" onclick="showSection('main')">&#8592; Wapas</button>
+        <div class="sv-form-title">Cylinder Do / Deliver</div>
+        <div class="sv-form-group">
+          <label class="sv-form-label">Customer <small>(Grahak)</small></label>
+          <select class="sv-form-select" id="fDelCust"></select>
+        </div>
+        <div class="sv-form-group">
+          <label class="sv-form-label">Gas Type <small>(Gas ka prakar)</small></label>
+          <select class="sv-form-select" id="fDelGas">
+            <option value="Oxygen">Oxygen</option>
+            <option value="Nitrogen">Nitrogen</option>
+            <option value="Argon">Argon</option>
+            <option value="CO2">CO2</option>
+            <option value="Acetylene">Acetylene</option>
+            <option value="LPG">LPG</option>
+          </select>
+        </div>
+        <div class="sv-form-group">
+          <label class="sv-form-label">Cylinder Size <small>(Size)</small></label>
+          <select class="sv-form-select" id="fDelSize">
+            <option value="Small">Small (Chhota)</option>
+            <option value="Normal">Normal</option>
+            <option value="Jumbo">Jumbo</option>
+          </select>
+        </div>
+        <div class="sv-form-group">
+          <label class="sv-form-label">Quantity <small>(Kitne)</small></label>
+          <input type="number" class="sv-form-input" id="fDelQty" value="1" min="1" inputmode="numeric">
+        </div>
+        <div class="sv-form-group">
+          <label class="sv-form-label">Amount Collected <small>(Paisa &#8377;)</small></label>
+          <input type="number" class="sv-form-input" id="fDelAmt" value="0" min="0" inputmode="numeric">
+        </div>
+        <div class="sv-form-group">
+          <label class="sv-form-label">Payment Mode <small>(Bhugtan)</small></label>
+          <select class="sv-form-select" id="fDelPayMode">
+            <option value="Cash">Cash (Naqad)</option>
+            <option value="UPI">UPI</option>
+          </select>
+        </div>
+        <div class="sv-form-group">
+          <label class="sv-form-label">Assign To <small>(Kisko do)</small></label>
+          <select class="sv-form-select" id="fDelAssign"></select>
+        </div>
+        <button class="sv-form-submit blue" id="btnDeliver" onclick="submitDelivery()">DELIVER KARO &#10003;</button>
+      </div>
+    </div>
+
+    <!-- ── WAPAS LO Form ── -->
+    <div class="sv-form" id="secReturn">
+      <div class="sv-form-card">
+        <button class="sv-back" onclick="showSection('main')">&#8592; Wapas</button>
+        <div class="sv-form-title">Wapas Lo / Return</div>
+        <div class="sv-form-group">
+          <label class="sv-form-label">Customer <small>(Grahak)</small></label>
+          <select class="sv-form-select" id="fRetCust"></select>
+        </div>
+        <div class="sv-form-group">
+          <label class="sv-form-label">Cylinder Size <small>(Size)</small></label>
+          <select class="sv-form-select" id="fRetSize">
+            <option value="Small">Small (Chhota)</option>
+            <option value="Normal">Normal</option>
+            <option value="Jumbo">Jumbo</option>
+          </select>
+        </div>
+        <div class="sv-form-group">
+          <label class="sv-form-label">Quantity <small>(Kitne)</small></label>
+          <input type="number" class="sv-form-input" id="fRetQty" value="1" min="1" inputmode="numeric">
+        </div>
+        <div class="sv-form-group">
+          <label class="sv-form-label">Deposit Refunded? <small>(Jama wapas?)</small></label>
+          <select class="sv-form-select" id="fRetDeposit">
+            <option value="No">No (Nahi)</option>
+            <option value="Yes">Yes (Haan)</option>
+          </select>
+        </div>
+        <button class="sv-form-submit green" onclick="submitReturn()">WAPAS KARO &#10003;</button>
+      </div>
+    </div>
+
+    <!-- ── PAYMENTS Section ── -->
+    <div class="sv-form" id="secPayments">
+      <div class="sv-form-card">
+        <button class="sv-back" onclick="showSection('main')">&#8592; Wapas</button>
+        <div class="sv-form-title">Payments / Baaki Paisa</div>
+        <div id="paymentsList">
+          <div class="loading"><div class="spinner"></div>Loading...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── WORKERS Section ── -->
+    <div class="sv-form" id="secWorkers">
+      <div class="sv-form-card">
+        <button class="sv-back" onclick="showSection('main')">&#8592; Wapas</button>
+        <div class="sv-form-title">Workers / Kaamgar</div>
+        <div id="workersList">
+          <div class="loading"><div class="spinner"></div>Loading...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── AAJ KA HISAAB ── -->
+    <div class="sv-form" id="secSummary">
+      <div class="sv-form-card">
+        <button class="sv-back" onclick="showSection('main')">&#8592; Wapas</button>
+        <div class="sv-form-title">Aaj Ka Hisaab / Today's Summary</div>
+        <div class="sv-summary-grid" id="summaryGrid">
+          <div class="loading"><div class="spinner"></div>Loading...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+// ══════════════════════════════════════
+// FIREBASE SETUP
+// ══════════════════════════════════════
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
+import {
+  initializeFirestore, persistentLocalCache, persistentSingleTabManager,
+  collection, doc, addDoc, getDoc, getDocs, updateDoc,
+  query, where, orderBy, onSnapshot, serverTimestamp, Timestamp, increment
+} from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+
+const app = initializeApp({
+  apiKey: "AIzaSyAXDo4KMjms_pclwIPPM2AjgeBrFBMnhVg",
+  authDomain: "usha-gases.firebaseapp.com",
+  projectId: "usha-gases",
+  storageBucket: "usha-gases.firebasestorage.app",
+  messagingSenderId: "577828579000",
+  appId: "1:577828579000:web:186defa22cdfea3dfc364d"
+});
+
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentSingleTabManager() })
+});
+
+// ══════════════════════════════════════
+// SHARED UTILITIES
+// ══════════════════════════════════════
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function todayStart() {
+  const d = new Date(); d.setHours(0,0,0,0);
+  return Timestamp.fromDate(d);
+}
+
+function hindiDate() {
+  const now = new Date();
+  const days = ['Ravivar','Somvar','Mangalvar','Budhvar','Guruvar','Shukravar','Shanivar'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear() + ', ' + days[now.getDay()];
+}
+
+async function hashPin(pin) {
+  const data = new TextEncoder().encode(pin);
+  const buf = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// ── Online/Offline ──
+function updateOnlineStatus() {
+  document.getElementById('offlineBar').classList.toggle('show', !navigator.onLine);
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+
+// ══════════════════════════════════════
+// SESSION / AUTH
+// ══════════════════════════════════════
+const SESSION_KEY = 'usha_session';
+let session = null;
+
+function getSession() {
+  try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch(e) { return null; }
+}
+function saveSession(s) { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); session = s; }
+function clearSession() { localStorage.removeItem(SESSION_KEY); session = null; }
+
+// ── Login Form Wiring ──
+const $loginScreen = document.getElementById('loginScreen');
+const $mainApp = document.getElementById('mainApp');
+const $loginForm = document.getElementById('loginForm');
+const $setupForm = document.getElementById('setupForm');
+
+document.getElementById('showSetup').addEventListener('click', () => {
+  $loginForm.style.display = 'none'; $setupForm.style.display = 'block';
+});
+document.getElementById('showLogin').addEventListener('click', () => {
+  $setupForm.style.display = 'none'; $loginForm.style.display = 'block';
+});
+
+document.getElementById('loginBtn').addEventListener('click', async () => {
+  const pin = document.getElementById('loginPin').value.trim();
+  const errEl = document.getElementById('loginError');
+  errEl.classList.remove('show');
+  if (pin.length !== 4) { errEl.textContent = 'PIN 4 digit ka hona chahiye!'; errEl.classList.add('show'); return; }
+  try {
+    const h = await hashPin(pin);
+    const q = query(collection(db, 'users'), where('pin','==',h), where('role','==','supervisor'));
+    const snap = await getDocs(q);
+    if (snap.empty) { errEl.textContent = 'Galat PIN! Dobara try karo.'; errEl.classList.add('show'); return; }
+    const userDoc = snap.docs[0];
+    const u = userDoc.data();
+    saveSession({ uid: userDoc.id, role: u.role, name: u.name, loginAt: Date.now() });
+    enterApp();
+  } catch(e) { errEl.textContent = 'Error: ' + e.message; errEl.classList.add('show'); }
+});
+
+document.getElementById('setupBtn').addEventListener('click', async () => {
+  const name = document.getElementById('setupName').value.trim();
+  const pin = document.getElementById('setupPin').value.trim();
+  const errEl = document.getElementById('setupError');
+  errEl.classList.remove('show');
+  if (!name) { errEl.textContent = 'Naam likho!'; errEl.classList.add('show'); return; }
+  if (pin.length !== 4) { errEl.textContent = 'PIN 4 digit ka hona chahiye!'; errEl.classList.add('show'); return; }
+  try {
+    const h = await hashPin(pin);
+    const docRef = await addDoc(collection(db, 'users'), {
+      name, role: 'supervisor', pin: h, approved: true, createdAt: serverTimestamp()
+    });
+    saveSession({ uid: docRef.id, role: 'supervisor', name, loginAt: Date.now() });
+    enterApp();
+  } catch(e) { errEl.textContent = 'Error: ' + e.message; errEl.classList.add('show'); }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  clearSession();
+  $mainApp.classList.remove('active');
+  $loginScreen.style.display = 'flex';
+  document.getElementById('loginPin').value = '';
+});
+
+function enterApp() {
+  $loginScreen.style.display = 'none';
+  $mainApp.classList.add('active');
+  document.getElementById('greetHello').innerHTML = 'Namaste ' + esc(session.name) + '! &#x1F64F;';
+  document.getElementById('greetDate').textContent = hindiDate();
+  loadTodayStats();
+  showSection('main');
+}
+
+// ══════════════════════════════════════
+// DATA CACHES
+// ══════════════════════════════════════
+let customersCache = [];
+let workersCache = [];
+
+async function loadCustomers() {
+  try {
+    const snap = await getDocs(collection(db, 'customers'));
+    customersCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch(e) { console.warn('loadCustomers error:', e); }
+}
+
+async function loadWorkers() {
+  try {
+    const q = query(collection(db, 'users'), where('role','==','worker'));
+    const snap = await getDocs(q);
+    workersCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch(e) { console.warn('loadWorkers error:', e); }
+}
+
+function populateCustomerDropdown(selId) {
+  const sel = document.getElementById(selId);
+  sel.innerHTML = customersCache.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+}
+
+function populateAssignDropdown() {
+  const sel = document.getElementById('fDelAssign');
+  let opts = `<option value="${session.uid}">Khud / Myself</option>`;
+  workersCache.filter(w => w.approved).forEach(w => {
+    opts += `<option value="${w.id}">${esc(w.name)}</option>`;
+  });
+  sel.innerHTML = opts;
+}
+
+// ══════════════════════════════════════
+// SECTION NAVIGATION
+// ══════════════════════════════════════
+const sections = ['secDeliver','secReturn','secPayments','secWorkers','secSummary'];
+
+window.showSection = async function(sec) {
+  document.getElementById('svMainActions').classList.toggle('hidden', sec !== 'main');
+  document.getElementById('svSuccess').classList.remove('show');
+  sections.forEach(s => document.getElementById(s).classList.remove('visible'));
+
+  if (sec === 'main') { window.scrollTo(0,0); return; }
+
+  await loadCustomers();
+
+  if (sec === 'deliver') {
+    await loadWorkers();
+    populateCustomerDropdown('fDelCust');
+    populateAssignDropdown();
+    document.getElementById('fDelQty').value = '1';
+    document.getElementById('fDelAmt').value = '0';
+    document.getElementById('secDeliver').classList.add('visible');
+  } else if (sec === 'return') {
+    populateCustomerDropdown('fRetCust');
+    document.getElementById('fRetQty').value = '1';
+    document.getElementById('secReturn').classList.add('visible');
+  } else if (sec === 'payments') {
+    renderPayments();
+    document.getElementById('secPayments').classList.add('visible');
+  } else if (sec === 'workers') {
+    await loadWorkers();
+    renderWorkers();
+    document.getElementById('secWorkers').classList.add('visible');
+  } else if (sec === 'summary') {
+    renderSummary();
+    document.getElementById('secSummary').classList.add('visible');
+  }
+  window.scrollTo(0,0);
+};
+
+function showSuccess(msg) {
+  const el = document.getElementById('svSuccess');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+// ══════════════════════════════════════
+// CYLINDER DO — Submit Delivery
+// ══════════════════════════════════════
+window.submitDelivery = async function() {
+  const custId = document.getElementById('fDelCust').value;
+  const qty = parseInt(document.getElementById('fDelQty').value) || 0;
+  if (!custId || qty < 1) { alert('Customer aur quantity daalo!'); return; }
+
+  const cust = customersCache.find(c => c.id === custId);
+  if (!cust) return;
+
+  const amount = parseInt(document.getElementById('fDelAmt').value) || 0;
+  const assignTo = document.getElementById('fDelAssign').value;
+  const isSelf = assignTo === session.uid;
+
+  const btn = document.getElementById('btnDeliver');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  try {
+    await addDoc(collection(db, 'deliveries'), {
+      customerId: custId,
+      customerName: cust.name,
+      customerAddress: cust.address || '',
+      gasType: document.getElementById('fDelGas').value,
+      cylinderSize: document.getElementById('fDelSize').value,
+      quantity: qty,
+      amount: amount,
+      depositCollected: 0,
+      paymentMode: document.getElementById('fDelPayMode').value,
+      status: isSelf ? 'delivered' : 'pending',
+      assignedTo: assignTo,
+      assignedBy: session.uid,
+      deliveredAt: isSelf ? serverTimestamp() : null,
+      returnedAt: null,
+      createdAt: serverTimestamp(),
+      syncedAt: serverTimestamp()
+    });
+
+    await updateDoc(doc(db, 'customers', custId), {
+      cylindersOut: increment(qty),
+      outstandingBalance: amount === 0 ? increment(0) : (cust.accountType === 'Credit' ? increment(amount) : increment(0))
+    });
+
+    showSection('main');
+    showSuccess('Delivery ho gaya! ' + qty + ' cylinder ' + cust.name + ' ko diya');
+    loadTodayStats();
+  } catch(e) {
+    alert('Error: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.innerHTML = 'DELIVER KARO &#10003;';
+  }
+};
+
+// ══════════════════════════════════════
+// WAPAS LO — Submit Return
+// ══════════════════════════════════════
+window.submitReturn = async function() {
+  const custId = document.getElementById('fRetCust').value;
+  const qty = parseInt(document.getElementById('fRetQty').value) || 0;
+  if (!custId || qty < 1) { alert('Customer aur quantity daalo!'); return; }
+
+  const cust = customersCache.find(c => c.id === custId);
+  if (!cust) return;
+
+  try {
+    await addDoc(collection(db, 'deliveries'), {
+      customerId: custId,
+      customerName: cust.name,
+      customerAddress: cust.address || '',
+      gasType: '-',
+      cylinderSize: document.getElementById('fRetSize').value,
+      quantity: qty,
+      amount: 0,
+      depositCollected: 0,
+      paymentMode: '-',
+      status: 'returned',
+      assignedTo: session.uid,
+      assignedBy: session.uid,
+      deliveredAt: null,
+      returnedAt: serverTimestamp(),
+      createdAt: serverTimestamp(),
+      syncedAt: serverTimestamp()
+    });
+
+    const newCylOut = Math.max(0, (cust.cylindersOut || 0) - qty);
+    await updateDoc(doc(db, 'customers', custId), { cylindersOut: newCylOut });
+
+    showSection('main');
+    showSuccess('Wapas le liya! ' + qty + ' cylinder ' + cust.name + ' se');
+    loadTodayStats();
+  } catch(e) { alert('Error: ' + e.message); }
+};
+
+// ══════════════════════════════════════
+// PAYMENTS
+// ══════════════════════════════════════
+function renderPayments() {
+  const outstanding = customersCache.filter(c => (c.outstandingBalance || 0) > 0);
+  const container = document.getElementById('paymentsList');
+  if (outstanding.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:30px;color:#94a3b8;">Sab clear hai! Koi baaki nahi &#127881;</div>';
+    return;
+  }
+  container.innerHTML = outstanding.map(c => `
+    <div class="payment-card" id="pay-${c.id}">
+      <div class="payment-cust-name">${esc(c.name)}</div>
+      <div class="payment-amount">&#8377;${(c.outstandingBalance||0).toLocaleString('en-IN')} baaki</div>
+      <button class="sv-form-submit orange" style="min-height:44px;font-size:15px;margin-top:10px" onclick="togglePayForm('${c.id}')">PAYMENT LO</button>
+      <div class="payment-form" id="pf-${c.id}">
+        <div class="payment-row">
+          <input type="number" class="sv-form-input" id="pamt-${c.id}" placeholder="Amount" inputmode="numeric">
+          <select class="sv-form-select" id="pmode-${c.id}">
+            <option value="Cash">Cash</option><option value="UPI">UPI</option>
+          </select>
+        </div>
+        <button class="sv-form-submit green" style="min-height:44px;font-size:15px;margin-top:8px" onclick="recordPayment('${c.id}')">JAMA KARO &#10003;</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.togglePayForm = function(cid) {
+  document.getElementById('pf-'+cid).classList.toggle('show');
+};
+
+window.recordPayment = async function(cid) {
+  const amt = parseInt(document.getElementById('pamt-'+cid).value) || 0;
+  if (amt <= 0) { alert('Amount daalo!'); return; }
+  try {
+    await updateDoc(doc(db, 'customers', cid), { outstandingBalance: increment(-amt) });
+    await loadCustomers();
+    renderPayments();
+    showSuccess('Payment of &#8377;' + amt + ' recorded!');
+  } catch(e) { alert('Error: ' + e.message); }
+};
+
+// ══════════════════════════════════════
+// WORKERS
+// ══════════════════════════════════════
+async function renderWorkers() {
+  const container = document.getElementById('workersList');
+
+  const pending = workersCache.filter(w => !w.approved);
+  const approved = workersCache.filter(w => w.approved);
+
+  let html = '';
+
+  if (pending.length > 0) {
+    html += '<div style="font-size:13px;font-weight:700;color:#64748b;margin-bottom:8px;text-transform:uppercase">Pending Approval</div>';
+    pending.forEach(w => {
+      html += `<div class="worker-card">
+        <div><div class="worker-name">${esc(w.name)}</div><div class="worker-status">Approval pending</div></div>
+        <button class="worker-approve-btn" onclick="approveWorker('${w.id}')">APPROVE</button>
+      </div>`;
+    });
+  }
+
+  if (approved.length > 0) {
+    html += '<div style="font-size:13px;font-weight:700;color:#64748b;margin:16px 0 8px;text-transform:uppercase">Active Workers</div>';
+
+    // Get today's delivery counts
+    let todayCounts = {};
+    try {
+      const q = query(collection(db, 'deliveries'), where('createdAt','>=',todayStart()));
+      const snap = await getDocs(q);
+      snap.docs.forEach(d => {
+        const data = d.data();
+        if (data.assignedTo) {
+          todayCounts[data.assignedTo] = (todayCounts[data.assignedTo] || 0) + 1;
+        }
+      });
+    } catch(e) {}
+
+    approved.forEach(w => {
+      const cnt = todayCounts[w.id] || 0;
+      html += `<div class="worker-card">
+        <div><div class="worker-name">${esc(w.name)}</div><div class="worker-status">Active</div></div>
+        <div class="worker-count">${cnt} aaj</div>
+      </div>`;
+    });
+  }
+
+  if (html === '') {
+    html = '<div style="text-align:center;padding:30px;color:#94a3b8;">Koi worker nahi hai abhi</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+window.approveWorker = async function(wid) {
+  try {
+    await updateDoc(doc(db, 'users', wid), { approved: true });
+    await loadWorkers();
+    renderWorkers();
+    showSuccess('Worker approved!');
+  } catch(e) { alert('Error: ' + e.message); }
+};
+
+// ══════════════════════════════════════
+// AAJ KA HISAAB — Today's Summary
+// ══════════════════════════════════════
+async function renderSummary() {
+  const grid = document.getElementById('summaryGrid');
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
+
+  try {
+    const q = query(collection(db, 'deliveries'), where('createdAt','>=',todayStart()));
+    const snap = await getDocs(q);
+
+    let cylDel = 0, cashCol = 0, upiCol = 0, cylRet = 0;
+    snap.docs.forEach(d => {
+      const data = d.data();
+      if (data.status === 'delivered' || data.status === 'pending') {
+        if (data.gasType !== '-') {
+          cylDel += data.quantity || 0;
+          if (data.paymentMode === 'UPI') upiCol += data.amount || 0;
+          else cashCol += data.amount || 0;
+        }
+      }
+      if (data.status === 'returned') {
+        cylRet += data.quantity || 0;
+      }
+    });
+
+    grid.innerHTML = `
+      <div class="sv-stat-card blue">
+        <div class="sv-stat-icon">&#128666;</div>
+        <div class="sv-stat-info">
+          <div class="sv-stat-label">Cylinder Diye (Delivered)</div>
+          <div class="sv-stat-value">${cylDel}</div>
+        </div>
+      </div>
+      <div class="sv-stat-card green">
+        <div class="sv-stat-icon">&#128181;</div>
+        <div class="sv-stat-info">
+          <div class="sv-stat-label">Cash Liya (Cash Collected)</div>
+          <div class="sv-stat-value">&#8377;${cashCol.toLocaleString('en-IN')}</div>
+        </div>
+      </div>
+      <div class="sv-stat-card purple">
+        <div class="sv-stat-icon">&#128241;</div>
+        <div class="sv-stat-info">
+          <div class="sv-stat-label">UPI Liya (UPI Collected)</div>
+          <div class="sv-stat-value">&#8377;${upiCol.toLocaleString('en-IN')}</div>
+        </div>
+      </div>
+      <div class="sv-stat-card orange">
+        <div class="sv-stat-icon">&#8617;</div>
+        <div class="sv-stat-info">
+          <div class="sv-stat-label">Wapas Liye (Returned)</div>
+          <div class="sv-stat-value">${cylRet}</div>
+        </div>
+      </div>`;
+  } catch(e) {
+    grid.innerHTML = '<div style="text-align:center;padding:30px;color:#dc2626;">Error loading summary</div>';
+  }
+}
+
+// ══════════════════════════════════════
+// GREETING — Today's Stats
+// ══════════════════════════════════════
+async function loadTodayStats() {
+  try {
+    const q = query(collection(db, 'deliveries'), where('createdAt','>=',todayStart()));
+    const snap = await getDocs(q);
+    let deliveries = 0;
+    snap.docs.forEach(d => {
+      const data = d.data();
+      if (data.gasType !== '-') deliveries++;
+    });
+    document.getElementById('greetPending').textContent = 'Aaj ' + deliveries + ' deliveries hui hain';
+  } catch(e) {
+    document.getElementById('greetPending').textContent = 'Aaj ka data load ho raha hai...';
+  }
+}
+
+// ── Auto-login on load ──
+session = getSession();
+if (session && session.role === 'supervisor') {
+  enterApp();
+}
+
+// ══════════════════════════════════════
+// PWA — Manifest + Service Worker
+// ══════════════════════════════════════
+const manifest = {
+  name: "Usha Gases - Supervisor",
+  short_name: "Supervisor",
+  start_url: "./supervisor-app.html",
+  display: "standalone",
+  background_color: "#ea580c",
+  theme_color: "#ea580c",
+  icons: [{
+    src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>⛽</text></svg>",
+    sizes: "any", type: "image/svg+xml"
+  }]
+};
+const mBlob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+const mLink = document.createElement('link');
+mLink.rel = 'manifest'; mLink.href = URL.createObjectURL(mBlob);
+document.head.appendChild(mLink);
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('supervisor-sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>

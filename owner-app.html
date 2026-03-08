@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Usha Owner">
+  <meta name="theme-color" content="#1d4ed8">
+  <title>Usha Gases — Owner Dashboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f1f5f9; color: #1e293b; min-height: 100vh;
+    }
+
+    /* ── Login ── */
+    .login-screen {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 24px;
+      background: linear-gradient(135deg, #0f2a4a 0%, #1d4ed8 100%);
+    }
+    .login-logo { font-size: 48px; margin-bottom: 12px; }
+    .login-title { color: white; font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+    .login-sub { color: rgba(255,255,255,0.8); font-size: 14px; margin-bottom: 32px; }
+    .login-card {
+      background: white; border-radius: 20px; padding: 28px; width: 100%;
+      max-width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .login-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; text-align: center; }
+    .login-input {
+      width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px;
+      font-size: 18px; text-align: center; letter-spacing: 12px; font-weight: 700;
+      outline: none; margin-bottom: 14px;
+    }
+    .login-input:focus { border-color: #1d4ed8; }
+    .login-input.name { letter-spacing: normal; text-align: left; font-size: 16px; }
+    .login-btn {
+      width: 100%; padding: 14px; border: none; border-radius: 12px;
+      font-size: 17px; font-weight: 700; color: white; cursor: pointer;
+      background: #1d4ed8; margin-top: 8px;
+    }
+    .login-btn:active { transform: scale(0.97); }
+    .login-toggle { text-align: center; margin-top: 16px; font-size: 14px; color: #64748b; }
+    .login-toggle a { color: #1d4ed8; font-weight: 600; cursor: pointer; text-decoration: none; }
+    .login-error {
+      background: #fee2e2; color: #dc2626; padding: 10px; border-radius: 8px;
+      font-size: 13px; font-weight: 600; text-align: center; margin-bottom: 12px; display: none;
+    }
+    .login-error.show { display: block; }
+
+    /* ── App ── */
+    .app { display: none; }
+    .app.active { display: block; }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #0f2a4a 0%, #1d4ed8 100%);
+      color: white; padding: 0 24px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25); position: sticky; top: 0; z-index: 100;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-icon {
+      width: 38px; height: 38px; background: rgba(255,255,255,0.18);
+      border-radius: 10px; display: flex; align-items: center;
+      justify-content: center; font-size: 20px; flex-shrink: 0;
+    }
+    .logo-text h1 { font-size: 16px; font-weight: 700; }
+    .logo-text p { font-size: 11px; opacity: 0.75; margin-top: 1px; }
+    .header-right { display: flex; align-items: center; gap: 14px; }
+    .header-date { font-size: 12px; opacity: 0.75; white-space: nowrap; }
+    .header-user { font-size: 12px; font-weight: 600; opacity: 0.9; }
+    .logout-btn {
+      background: rgba(255,255,255,0.2); border: none; color: white;
+      padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+
+    /* ── Nav ── */
+    nav {
+      background: white; border-bottom: 1px solid #e2e8f0;
+      padding: 0 16px; display: flex; overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    nav::-webkit-scrollbar { display: none; }
+    .nav-tab {
+      padding: 12px 14px; cursor: pointer; font-size: 13px; font-weight: 600;
+      color: #64748b; border-bottom: 3px solid transparent;
+      transition: color 0.15s, border-color 0.15s; white-space: nowrap; user-select: none;
+    }
+    .nav-tab:hover { color: #1d4ed8; }
+    .nav-tab.active { color: #1d4ed8; border-bottom-color: #1d4ed8; }
+
+    /* ── Main ── */
+    main { padding: 20px; max-width: 1200px; margin: 0 auto; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Section Header ── */
+    .section-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
+    }
+    .section-title { font-size: 20px; font-weight: 700; }
+
+    /* ── Stat Cards ── */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px; margin-bottom: 20px;
+    }
+    .stat-card {
+      background: white; border-radius: 12px; padding: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-left: 4px solid;
+    }
+    .stat-card.blue   { border-color: #1d4ed8; }
+    .stat-card.orange { border-color: #d97706; }
+    .stat-card.green  { border-color: #16a34a; }
+    .stat-card.red    { border-color: #dc2626; }
+    .stat-card.purple { border-color: #7c3aed; }
+    .stat-label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: #64748b; margin-bottom: 6px;
+    }
+    .stat-value { font-size: 26px; font-weight: 800; color: #0f172a; line-height: 1; }
+    .stat-sub { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+
+    /* ── Cards ── */
+    .card {
+      background: white; border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; margin-bottom: 16px;
+    }
+    .card-header {
+      padding: 12px 16px; border-bottom: 1px solid #f1f5f9;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .card-title { font-size: 14px; font-weight: 700; color: #1e293b; }
+    .card-body { padding: 0; overflow-x: auto; }
+
+    /* ── Tables ── */
+    table { width: 100%; border-collapse: collapse; min-width: 600px; }
+    thead th {
+      background: #f8fafc; padding: 10px 14px; text-align: left;
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: #64748b; border-bottom: 1px solid #e2e8f0;
+      white-space: nowrap;
+    }
+    tbody td {
+      padding: 10px 14px; font-size: 13px; color: #374151;
+      border-bottom: 1px solid #f1f5f9; white-space: nowrap;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #f8fafc; }
+
+    /* ── Toolbar ── */
+    .toolbar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .search-input {
+      flex: 1; min-width: 140px; padding: 8px 12px;
+      border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; outline: none;
+    }
+    .search-input:focus { border-color: #1d4ed8; box-shadow: 0 0 0 2px rgba(29,78,216,0.12); }
+    .filter-select {
+      padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px;
+      font-size: 13px; background: white; outline: none; cursor: pointer;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+      cursor: pointer; border: none; white-space: nowrap;
+    }
+    .btn-primary { background: #1d4ed8; color: white; }
+    .btn-primary:hover { background: #1e40af; }
+    .btn-success { background: #16a34a; color: white; }
+    .btn-danger { background: #dc2626; color: white; }
+    .btn-outline { background: white; color: #374151; border: 1px solid #d1d5db; }
+    .btn-outline:hover { background: #f8fafc; }
+    .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-flex; align-items: center; padding: 2px 8px;
+      border-radius: 20px; font-size: 11px; font-weight: 600;
+    }
+    .badge-blue   { background: #dbeafe; color: #1e40af; }
+    .badge-green  { background: #dcfce7; color: #15803d; }
+    .badge-orange { background: #fef3c7; color: #b45309; }
+    .badge-red    { background: #fee2e2; color: #dc2626; }
+    .badge-purple { background: #ede9fe; color: #6d28d9; }
+    .badge-gray   { background: #f1f5f9; color: #475569; }
+
+    /* ── Modals ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(15,23,42,0.55); z-index: 500;
+      align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: white; border-radius: 16px; width: 100%;
+      max-width: 480px; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+    }
+    .modal-header {
+      padding: 16px 20px; border-bottom: 1px solid #f1f5f9;
+      display: flex; justify-content: space-between; align-items: center;
+      position: sticky; top: 0; background: white; z-index: 1;
+    }
+    .modal-title { font-size: 16px; font-weight: 700; }
+    .modal-close {
+      background: none; border: none; font-size: 20px; cursor: pointer;
+      color: #94a3b8; padding: 2px 6px; border-radius: 6px;
+    }
+    .modal-close:hover { color: #1e293b; background: #f1f5f9; }
+    .modal-body { padding: 20px; }
+    .modal-footer {
+      padding: 12px 20px; border-top: 1px solid #f1f5f9;
+      display: flex; justify-content: flex-end; gap: 8px;
+    }
+
+    /* ── Forms ── */
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 4px; }
+    .form-input, .form-select {
+      width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0;
+      border-radius: 8px; font-size: 14px; outline: none;
+    }
+    .form-input:focus, .form-select:focus { border-color: #1d4ed8; box-shadow: 0 0 0 2px rgba(29,78,216,0.12); }
+    .form-select { background: white; cursor: pointer; }
+
+    /* ── Activity ── */
+    .activity-item {
+      display: flex; align-items: flex-start; gap: 10px; padding: 10px 16px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+    .activity-dot.blue { background: #1d4ed8; }
+    .activity-dot.green { background: #16a34a; }
+    .activity-dot.orange { background: #d97706; }
+    .activity-text { font-size: 13px; color: #374151; }
+    .activity-time { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+    /* ── Empty ── */
+    .empty-state { text-align: center; padding: 40px 20px; color: #94a3b8; }
+    .empty-icon { font-size: 40px; margin-bottom: 8px; }
+    .empty-state p { font-size: 13px; }
+
+    /* ── Reports ── */
+    .report-picker { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .report-chip {
+      padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;
+      cursor: pointer; border: 2px solid #e2e8f0; background: white; color: #374151;
+    }
+    .report-chip.active { background: #1d4ed8; color: white; border-color: #1d4ed8; }
+
+    /* ── Loading ── */
+    .loading { text-align: center; padding: 40px; color: #94a3b8; }
+    .spinner {
+      width: 28px; height: 28px; border: 3px solid #e2e8f0;
+      border-top: 3px solid #1d4ed8; border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      main { padding: 14px; }
+      header { padding: 0 14px; height: 54px; }
+      .logo-text h1 { font-size: 14px; }
+      .logo-text p { display: none; }
+      .header-date { display: none; }
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .stat-value { font-size: 22px; }
+      .stat-card { padding: 14px; }
+      .section-title { font-size: 18px; }
+      table { min-width: 500px; }
+      .nav-tab { padding: 11px 12px; font-size: 12px; }
+    }
+    @media (max-width: 400px) {
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN ══════════ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-logo">&#9981;</div>
+  <div class="login-title">Usha Gases</div>
+  <div class="login-sub">Owner Dashboard</div>
+  <div class="login-card">
+    <div id="loginForm">
+      <h3>Enter PIN</h3>
+      <div class="login-error" id="loginError"></div>
+      <input type="tel" class="login-input" id="loginPin" maxlength="4" placeholder="&#8226;&#8226;&#8226;&#8226;" inputmode="numeric" autocomplete="off">
+      <button class="login-btn" id="loginBtn">LOGIN</button>
+      <div class="login-toggle">First time? <a id="showSetup">Setup account</a></div>
+    </div>
+    <div id="setupForm" style="display:none">
+      <h3>First Time Setup</h3>
+      <div class="login-error" id="setupError"></div>
+      <input type="text" class="login-input name" id="setupName" placeholder="Your name" autocomplete="off">
+      <input type="tel" class="login-input" id="setupPin" maxlength="4" placeholder="Create 4-digit PIN" inputmode="numeric" autocomplete="off">
+      <button class="login-btn" id="setupBtn">CREATE ACCOUNT</button>
+      <div class="login-toggle"><a id="showLogin">Have a PIN? Login</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MAIN APP ══════════ -->
+<div class="app" id="mainApp">
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">&#9981;</div>
+    <div class="logo-text"><h1>Usha Gases — Owner</h1><p>Business Dashboard</p></div>
+  </div>
+  <div class="header-right">
+    <span class="header-date" id="headerDate"></span>
+    <span class="header-user" id="headerUser"></span>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-tab active" data-tab="dashboard">Dashboard</div>
+  <div class="nav-tab" data-tab="customers">Customers</div>
+  <div class="nav-tab" data-tab="deliveries">Deliveries</div>
+  <div class="nav-tab" data-tab="deposits">Deposits</div>
+  <div class="nav-tab" data-tab="reports">Reports</div>
+</nav>
+
+<main>
+  <!-- ═══ DASHBOARD ═══ -->
+  <div class="tab-panel active" id="tab-dashboard">
+    <div class="section-header"><h2 class="section-title">Dashboard</h2></div>
+    <div class="stats-grid" id="dashStats"></div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Recent Activity</span></div>
+      <div class="card-body" id="dashActivity">
+        <div class="loading"><div class="spinner"></div>Loading...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CUSTOMERS ═══ -->
+  <div class="tab-panel" id="tab-customers">
+    <div class="section-header">
+      <h2 class="section-title">Customers</h2>
+      <button class="btn btn-primary" onclick="openCustModal()">+ Add Customer</button>
+    </div>
+    <div class="toolbar">
+      <input type="text" class="search-input" placeholder="Search customers..." id="custSearch" oninput="renderCustomers()">
+      <select class="filter-select" id="custFilterType" onchange="renderCustomers()">
+        <option value="">All Types</option>
+        <option value="Hospital">Hospital</option>
+        <option value="Industrial">Industrial</option>
+        <option value="Retail">Retail</option>
+        <option value="Laboratory">Laboratory</option>
+      </select>
+    </div>
+    <div class="card"><div class="card-body">
+      <table><thead><tr>
+        <th>Name</th><th>Phone</th><th>Type</th><th>Account</th><th>Cyl Out</th><th>Deposit</th><th>Outstanding</th><th>Actions</th>
+      </tr></thead><tbody id="custBody"></tbody></table>
+    </div></div>
+  </div>
+
+  <!-- ═══ DELIVERIES ═══ -->
+  <div class="tab-panel" id="tab-deliveries">
+    <div class="section-header">
+      <h2 class="section-title">Deliveries</h2>
+      <button class="btn btn-primary" onclick="openDelModal()">+ Log Delivery</button>
+    </div>
+    <div class="toolbar">
+      <input type="text" class="search-input" placeholder="Search..." id="delSearch" oninput="renderDeliveries()">
+      <select class="filter-select" id="delFilterStatus" onchange="renderDeliveries()">
+        <option value="">All Status</option>
+        <option value="pending">Pending</option>
+        <option value="delivered">Delivered</option>
+        <option value="returned">Returned</option>
+      </select>
+    </div>
+    <div class="card"><div class="card-body">
+      <table><thead><tr>
+        <th>Date</th><th>Customer</th><th>Size</th><th>Gas</th><th>Qty</th><th>Amount</th><th>Payment</th><th>Status</th><th>Assigned</th>
+      </tr></thead><tbody id="delBody"></tbody></table>
+    </div></div>
+  </div>
+
+  <!-- ═══ DEPOSITS ═══ -->
+  <div class="tab-panel" id="tab-deposits">
+    <div class="section-header"><h2 class="section-title">Deposit Ledger</h2></div>
+    <div class="card"><div class="card-body">
+      <table><thead><tr>
+        <th>Customer</th><th>Type</th><th>Deposit Held</th><th>Cylinders Out</th><th>Outstanding</th>
+      </tr></thead><tbody id="depBody"></tbody></table>
+    </div></div>
+  </div>
+
+  <!-- ═══ REPORTS ═══ -->
+  <div class="tab-panel" id="tab-reports">
+    <div class="section-header"><h2 class="section-title">Reports</h2></div>
+    <div class="report-picker" id="reportPicker">
+      <div class="report-chip active" data-range="today">Today</div>
+      <div class="report-chip" data-range="week">This Week</div>
+      <div class="report-chip" data-range="month">This Month</div>
+      <div class="report-chip" data-range="all">All Time</div>
+    </div>
+    <div class="stats-grid" id="reportStats"></div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Delivery Breakdown</span></div>
+      <div class="card-body" id="reportBody">
+        <div class="loading"><div class="spinner"></div>Loading...</div>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- ═══ CUSTOMER MODAL ═══ -->
+<div class="modal-overlay" id="custModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="custModalTitle">Add Customer</span>
+      <button class="modal-close" onclick="closeModal('custModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="custEditId">
+      <div class="form-group"><label class="form-label">Name *</label>
+        <input type="text" class="form-input" id="fCustName" placeholder="Customer name"></div>
+      <div class="form-group"><label class="form-label">Phone *</label>
+        <input type="tel" class="form-input" id="fCustPhone" placeholder="Phone number"></div>
+      <div class="form-group"><label class="form-label">Address</label>
+        <input type="text" class="form-input" id="fCustAddr" placeholder="Address"></div>
+      <div class="form-group"><label class="form-label">Type</label>
+        <select class="form-select" id="fCustType">
+          <option value="Hospital">Hospital</option><option value="Industrial">Industrial</option>
+          <option value="Retail">Retail</option><option value="Laboratory">Laboratory</option>
+        </select></div>
+      <div class="form-group"><label class="form-label">Account Type</label>
+        <select class="form-select" id="fCustAcct">
+          <option value="Cash">Cash</option><option value="Credit">Credit</option>
+        </select></div>
+      <div class="form-group"><label class="form-label">Security Deposit (&#8377;)</label>
+        <input type="number" class="form-input" id="fCustDep" value="0"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('custModal')">Cancel</button>
+      <button class="btn btn-primary" id="custSaveBtn" onclick="saveCust()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DELIVERY MODAL ═══ -->
+<div class="modal-overlay" id="delModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Log Delivery</span>
+      <button class="modal-close" onclick="closeModal('delModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Customer *</label>
+        <select class="form-select" id="fDelCust"></select></div>
+      <div class="form-group"><label class="form-label">Gas Type</label>
+        <select class="form-select" id="fDelGas">
+          <option value="Oxygen">Oxygen</option><option value="Nitrogen">Nitrogen</option>
+          <option value="Argon">Argon</option><option value="CO2">CO2</option>
+          <option value="Acetylene">Acetylene</option><option value="LPG">LPG</option>
+        </select></div>
+      <div class="form-group"><label class="form-label">Cylinder Size</label>
+        <select class="form-select" id="fDelSize">
+          <option value="Small">Small</option><option value="Normal">Normal</option><option value="Jumbo">Jumbo</option>
+        </select></div>
+      <div class="form-group"><label class="form-label">Quantity *</label>
+        <input type="number" class="form-input" id="fDelQty" value="1" min="1"></div>
+      <div class="form-group"><label class="form-label">Amount (&#8377;)</label>
+        <input type="number" class="form-input" id="fDelAmt" value="0" min="0"></div>
+      <div class="form-group"><label class="form-label">Payment Mode</label>
+        <select class="form-select" id="fDelPay">
+          <option value="Cash">Cash</option><option value="UPI">UPI</option>
+        </select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('delModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveDel()">Log Delivery</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+// ══════════════════════════════════════
+// FIREBASE
+// ══════════════════════════════════════
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
+import {
+  initializeFirestore, persistentLocalCache, persistentSingleTabManager,
+  collection, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc,
+  query, where, orderBy, onSnapshot, serverTimestamp, Timestamp, increment
+} from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+
+const app = initializeApp({
+  apiKey: "AIzaSyAXDo4KMjms_pclwIPPM2AjgeBrFBMnhVg",
+  authDomain: "usha-gases.firebaseapp.com",
+  projectId: "usha-gases",
+  storageBucket: "usha-gases.firebasestorage.app",
+  messagingSenderId: "577828579000",
+  appId: "1:577828579000:web:186defa22cdfea3dfc364d"
+});
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentSingleTabManager() })
+});
+
+// ══════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function todayStart() { const d = new Date(); d.setHours(0,0,0,0); return Timestamp.fromDate(d); }
+function fmtDate(ts) {
+  if (!ts) return '-';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+}
+function fmtRupee(n) { return '₹' + (n||0).toLocaleString('en-IN'); }
+
+async function hashPin(pin) {
+  const data = new TextEncoder().encode(pin);
+  const buf = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// ══════════════════════════════════════
+// SESSION / AUTH
+// ══════════════════════════════════════
+const SESSION_KEY = 'usha_session';
+let session = null;
+function getSession() { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch(e) { return null; } }
+function saveSession(s) { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); session = s; }
+function clearSession() { localStorage.removeItem(SESSION_KEY); session = null; }
+
+const $login = document.getElementById('loginScreen');
+const $app = document.getElementById('mainApp');
+
+document.getElementById('showSetup').onclick = () => { document.getElementById('loginForm').style.display='none'; document.getElementById('setupForm').style.display='block'; };
+document.getElementById('showLogin').onclick = () => { document.getElementById('setupForm').style.display='none'; document.getElementById('loginForm').style.display='block'; };
+
+document.getElementById('loginBtn').onclick = async () => {
+  const pin = document.getElementById('loginPin').value.trim();
+  const err = document.getElementById('loginError');
+  err.classList.remove('show');
+  if (pin.length !== 4) { err.textContent='PIN must be 4 digits'; err.classList.add('show'); return; }
+  try {
+    const h = await hashPin(pin);
+    const snap = await getDocs(query(collection(db,'users'), where('pin','==',h), where('role','==','owner')));
+    if (snap.empty) { err.textContent='Wrong PIN!'; err.classList.add('show'); return; }
+    const ud = snap.docs[0]; const u = ud.data();
+    saveSession({ uid:ud.id, role:'owner', name:u.name, loginAt:Date.now() });
+    enterApp();
+  } catch(e) { err.textContent='Error: '+e.message; err.classList.add('show'); }
+};
+
+document.getElementById('setupBtn').onclick = async () => {
+  const name = document.getElementById('setupName').value.trim();
+  const pin = document.getElementById('setupPin').value.trim();
+  const err = document.getElementById('setupError');
+  err.classList.remove('show');
+  if (!name) { err.textContent='Enter your name'; err.classList.add('show'); return; }
+  if (pin.length !== 4) { err.textContent='PIN must be 4 digits'; err.classList.add('show'); return; }
+  try {
+    const h = await hashPin(pin);
+    const ref = await addDoc(collection(db,'users'), { name, role:'owner', pin:h, approved:true, createdAt:serverTimestamp() });
+    saveSession({ uid:ref.id, role:'owner', name, loginAt:Date.now() });
+    enterApp();
+  } catch(e) { err.textContent='Error: '+e.message; err.classList.add('show'); }
+};
+
+document.getElementById('logoutBtn').onclick = () => {
+  clearSession(); $app.classList.remove('active'); $login.style.display='flex';
+};
+
+function enterApp() {
+  $login.style.display='none'; $app.classList.add('active');
+  document.getElementById('headerDate').textContent = new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('headerUser').textContent = session.name;
+  initDashboard();
+  seedIfEmpty();
+}
+
+session = getSession();
+if (session && session.role === 'owner') enterApp();
+
+// ══════════════════════════════════════
+// SEED DATA
+// ══════════════════════════════════════
+async function seedIfEmpty() {
+  try {
+    const snap = await getDocs(collection(db,'customers'));
+    if (snap.size > 0) return;
+    const seeds = [
+      { name:'City General Hospital', phone:'9876543210', address:'MG Road, Sector 5', type:'Hospital', accountType:'Credit', cylindersOut:8, depositHeld:15000, outstandingBalance:4200, createdAt:serverTimestamp() },
+      { name:'Sharma Welding Works', phone:'9123456789', address:'Industrial Area Phase 2', type:'Industrial', accountType:'Cash', cylindersOut:3, depositHeld:5000, outstandingBalance:0, createdAt:serverTimestamp() },
+      { name:'Patel Gas Agency', phone:'9988776655', address:'Main Market, Sadar', type:'Retail', accountType:'Credit', cylindersOut:5, depositHeld:10000, outstandingBalance:1800, createdAt:serverTimestamp() }
+    ];
+    for (const s of seeds) await addDoc(collection(db,'customers'), s);
+  } catch(e) { console.warn('Seed error:', e); }
+}
+
+// ══════════════════════════════════════
+// TAB NAVIGATION
+// ══════════════════════════════════════
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
+    const t = tab.dataset.tab;
+    if (t==='customers') loadCustomers().then(renderCustomers);
+    else if (t==='deliveries') loadDeliveries().then(renderDeliveries);
+    else if (t==='deposits') loadCustomers().then(renderDeposits);
+    else if (t==='reports') generateReport();
+    else if (t==='dashboard') initDashboard();
+  });
+});
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+window.closeModal = closeModal;
+
+document.querySelectorAll('.modal-overlay').forEach(ov => {
+  ov.addEventListener('click', e => { if(e.target===ov) ov.classList.remove('open'); });
+});
+
+// ══════════════════════════════════════
+// DATA
+// ══════════════════════════════════════
+let customers = [], deliveries = [], users = [];
+
+async function loadCustomers() {
+  try {
+    const snap = await getDocs(collection(db,'customers'));
+    customers = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+  } catch(e) {}
+}
+
+async function loadDeliveries() {
+  try {
+    const snap = await getDocs(query(collection(db,'deliveries'), orderBy('createdAt','desc')));
+    deliveries = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+  } catch(e) {}
+}
+
+async function loadUsers() {
+  try {
+    const snap = await getDocs(collection(db,'users'));
+    users = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════
+async function initDashboard() {
+  await Promise.all([loadCustomers(), loadDeliveries()]);
+  let cylOut=0, deposits=0, outstanding=0;
+  customers.forEach(c => { cylOut += c.cylindersOut||0; deposits += c.depositHeld||0; outstanding += c.outstandingBalance||0; });
+
+  const todayDels = deliveries.filter(d => {
+    if (!d.createdAt) return false;
+    const dt = d.createdAt.toDate ? d.createdAt.toDate() : new Date(d.createdAt);
+    const t = new Date(); t.setHours(0,0,0,0);
+    return dt >= t;
+  });
+
+  document.getElementById('dashStats').innerHTML = `
+    <div class="stat-card blue"><div class="stat-label">Cylinders Out</div><div class="stat-value">${cylOut}</div><div class="stat-sub">With customers</div></div>
+    <div class="stat-card orange"><div class="stat-label">Deposits Held</div><div class="stat-value">${fmtRupee(deposits)}</div><div class="stat-sub">Security deposits</div></div>
+    <div class="stat-card red"><div class="stat-label">Outstanding</div><div class="stat-value">${fmtRupee(outstanding)}</div><div class="stat-sub">Unpaid balances</div></div>
+    <div class="stat-card green"><div class="stat-label">Today's Deliveries</div><div class="stat-value">${todayDels.length}</div><div class="stat-sub">${customers.length} total customers</div></div>`;
+
+  const container = document.getElementById('dashActivity');
+  const recent = deliveries.slice(0, 10);
+  if (recent.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128203;</div><p>No activity yet</p></div>';
+    return;
+  }
+  container.innerHTML = recent.map(d => {
+    const dot = d.status==='returned' ? 'green' : d.status==='pending' ? 'orange' : 'blue';
+    const amt = (d.amount||0) > 0 ? ' — '+fmtRupee(d.amount) : '';
+    return `<div class="activity-item"><div class="activity-dot ${dot}"></div><div>
+      <div class="activity-text">${esc(d.customerName||'')} — ${d.quantity||0} x ${esc(d.gasType||'')} (${d.status})${amt}</div>
+      <div class="activity-time">${fmtDate(d.createdAt)}</div></div></div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+// CUSTOMERS
+// ══════════════════════════════════════
+function renderCustomers() {
+  const search = (document.getElementById('custSearch').value||'').toLowerCase();
+  const fType = document.getElementById('custFilterType').value;
+  const filtered = customers.filter(c => {
+    if (search && !(c.name||'').toLowerCase().includes(search) && !(c.phone||'').includes(search)) return false;
+    if (fType && c.type !== fType) return false;
+    return true;
+  });
+  const body = document.getElementById('custBody');
+  if (filtered.length === 0) { body.innerHTML = '<tr><td colspan="8"><div class="empty-state"><p>No customers found</p></div></td></tr>'; return; }
+  const tb = { Hospital:'badge-blue', Industrial:'badge-orange', Retail:'badge-green', Laboratory:'badge-purple' };
+  body.innerHTML = filtered.map(c => `<tr>
+    <td><strong>${esc(c.name)}</strong></td>
+    <td>${esc(c.phone||'')}</td>
+    <td><span class="badge ${tb[c.type]||'badge-gray'}">${c.type||''}</span></td>
+    <td><span class="badge ${c.accountType==='Credit'?'badge-orange':'badge-green'}">${c.accountType||''}</span></td>
+    <td>${c.cylindersOut||0}</td>
+    <td>${fmtRupee(c.depositHeld)}</td>
+    <td>${(c.outstandingBalance||0)>0 ? '<span class="badge badge-red">'+fmtRupee(c.outstandingBalance)+'</span>' : '<span class="badge badge-green">Clear</span>'}</td>
+    <td><button class="btn btn-outline btn-sm" onclick="editCust('${c.id}')">Edit</button></td>
+  </tr>`).join('');
+}
+window.renderCustomers = renderCustomers;
+
+window.openCustModal = function(editId) {
+  document.getElementById('custEditId').value = '';
+  document.getElementById('custModalTitle').textContent = 'Add Customer';
+  document.getElementById('fCustName').value = '';
+  document.getElementById('fCustPhone').value = '';
+  document.getElementById('fCustAddr').value = '';
+  document.getElementById('fCustDep').value = '0';
+  openModal('custModal');
+};
+
+window.editCust = async function(id) {
+  const c = customers.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('custEditId').value = id;
+  document.getElementById('custModalTitle').textContent = 'Edit Customer';
+  document.getElementById('fCustName').value = c.name || '';
+  document.getElementById('fCustPhone').value = c.phone || '';
+  document.getElementById('fCustAddr').value = c.address || '';
+  document.getElementById('fCustType').value = c.type || 'Retail';
+  document.getElementById('fCustAcct').value = c.accountType || 'Cash';
+  document.getElementById('fCustDep').value = c.depositHeld || 0;
+  openModal('custModal');
+};
+
+window.saveCust = async function() {
+  const name = document.getElementById('fCustName').value.trim();
+  const phone = document.getElementById('fCustPhone').value.trim();
+  if (!name || !phone) { alert('Name and phone required'); return; }
+  const data = {
+    name, phone,
+    address: document.getElementById('fCustAddr').value.trim(),
+    type: document.getElementById('fCustType').value,
+    accountType: document.getElementById('fCustAcct').value,
+    depositHeld: parseInt(document.getElementById('fCustDep').value) || 0
+  };
+  const editId = document.getElementById('custEditId').value;
+  try {
+    if (editId) {
+      await updateDoc(doc(db,'customers',editId), data);
+    } else {
+      data.cylindersOut = 0;
+      data.outstandingBalance = 0;
+      data.createdAt = serverTimestamp();
+      await addDoc(collection(db,'customers'), data);
+    }
+    closeModal('custModal');
+    await loadCustomers();
+    renderCustomers();
+  } catch(e) { alert('Error: '+e.message); }
+};
+
+// ══════════════════════════════════════
+// DELIVERIES
+// ══════════════════════════════════════
+function getOverdueBadge(d) {
+  if (d.status === 'returned') return 'badge-green';
+  if (!d.createdAt) return 'badge-blue';
+  const dt = d.createdAt.toDate ? d.createdAt.toDate() : new Date(d.createdAt);
+  const days = Math.floor((Date.now() - dt.getTime()) / 86400000);
+  if (days >= 30) return 'badge-red';
+  if (days >= 15) return 'badge-orange';
+  return 'badge-blue';
+}
+
+function renderDeliveries() {
+  const search = (document.getElementById('delSearch').value||'').toLowerCase();
+  const fStatus = document.getElementById('delFilterStatus').value;
+  const filtered = deliveries.filter(d => {
+    if (search && !(d.customerName||'').toLowerCase().includes(search) && !(d.gasType||'').toLowerCase().includes(search)) return false;
+    if (fStatus && d.status !== fStatus) return false;
+    return true;
+  });
+  const body = document.getElementById('delBody');
+  if (filtered.length === 0) { body.innerHTML = '<tr><td colspan="9"><div class="empty-state"><p>No deliveries found</p></div></td></tr>'; return; }
+
+  const userMap = {};
+  users.forEach(u => { userMap[u.id] = u.name; });
+
+  body.innerHTML = filtered.map(d => {
+    const badge = getOverdueBadge(d);
+    const statusText = d.status || 'pending';
+    return `<tr>
+      <td>${fmtDate(d.createdAt)}</td>
+      <td><strong>${esc(d.customerName||'')}</strong></td>
+      <td>${d.cylinderSize||'-'}</td>
+      <td>${esc(d.gasType||'-')}</td>
+      <td>${d.quantity||0}</td>
+      <td>${fmtRupee(d.amount)}</td>
+      <td>${d.paymentMode||'-'}</td>
+      <td><span class="badge ${badge}">${statusText}</span></td>
+      <td>${esc(userMap[d.assignedTo] || '-')}</td>
+    </tr>`;
+  }).join('');
+}
+window.renderDeliveries = renderDeliveries;
+
+window.openDelModal = async function() {
+  await loadCustomers();
+  document.getElementById('fDelCust').innerHTML = customers.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  document.getElementById('fDelQty').value = '1';
+  document.getElementById('fDelAmt').value = '0';
+  openModal('delModal');
+};
+
+window.saveDel = async function() {
+  const custId = document.getElementById('fDelCust').value;
+  const qty = parseInt(document.getElementById('fDelQty').value) || 0;
+  if (!custId || qty < 1) { alert('Customer and quantity required'); return; }
+  const cust = customers.find(c => c.id === custId);
+  if (!cust) return;
+  const amount = parseInt(document.getElementById('fDelAmt').value) || 0;
+  try {
+    await addDoc(collection(db,'deliveries'), {
+      customerId: custId, customerName: cust.name, customerAddress: cust.address||'',
+      gasType: document.getElementById('fDelGas').value,
+      cylinderSize: document.getElementById('fDelSize').value,
+      quantity: qty, amount,
+      depositCollected: 0,
+      paymentMode: document.getElementById('fDelPay').value,
+      status: 'delivered',
+      assignedTo: session.uid, assignedBy: session.uid,
+      deliveredAt: serverTimestamp(), returnedAt: null,
+      createdAt: serverTimestamp(), syncedAt: serverTimestamp()
+    });
+    await updateDoc(doc(db,'customers',custId), {
+      cylindersOut: increment(qty),
+      outstandingBalance: cust.accountType==='Credit' && amount===0 ? increment(0) : increment(0)
+    });
+    closeModal('delModal');
+    await loadDeliveries();
+    renderDeliveries();
+    initDashboard();
+  } catch(e) { alert('Error: '+e.message); }
+};
+
+// ══════════════════════════════════════
+// DEPOSITS
+// ══════════════════════════════════════
+function renderDeposits() {
+  const sorted = [...customers].sort((a,b) => (b.depositHeld||0) - (a.depositHeld||0));
+  const body = document.getElementById('depBody');
+  if (sorted.length === 0) { body.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>No customers</p></div></td></tr>'; return; }
+  const tb = { Hospital:'badge-blue', Industrial:'badge-orange', Retail:'badge-green', Laboratory:'badge-purple' };
+  body.innerHTML = sorted.map(c => `<tr>
+    <td><strong>${esc(c.name)}</strong></td>
+    <td><span class="badge ${tb[c.type]||'badge-gray'}">${c.type||''}</span></td>
+    <td style="font-weight:700">${fmtRupee(c.depositHeld)}</td>
+    <td>${c.cylindersOut||0}</td>
+    <td>${(c.outstandingBalance||0)>0 ? '<span class="badge badge-red">'+fmtRupee(c.outstandingBalance)+'</span>' : '<span class="badge badge-green">Clear</span>'}</td>
+  </tr>`).join('');
+}
+
+// ══════════════════════════════════════
+// REPORTS
+// ══════════════════════════════════════
+let reportRange = 'today';
+
+document.querySelectorAll('.report-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.report-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    reportRange = chip.dataset.range;
+    generateReport();
+  });
+});
+
+async function generateReport() {
+  await loadDeliveries();
+
+  let rangeStart = null;
+  const now = new Date();
+  if (reportRange === 'today') {
+    rangeStart = new Date(); rangeStart.setHours(0,0,0,0);
+  } else if (reportRange === 'week') {
+    rangeStart = new Date(); rangeStart.setDate(rangeStart.getDate() - rangeStart.getDay()); rangeStart.setHours(0,0,0,0);
+  } else if (reportRange === 'month') {
+    rangeStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  }
+
+  const filtered = deliveries.filter(d => {
+    if (!rangeStart) return true;
+    if (!d.createdAt) return false;
+    const dt = d.createdAt.toDate ? d.createdAt.toDate() : new Date(d.createdAt);
+    return dt >= rangeStart;
+  });
+
+  let totalDel=0, totalRet=0, cashCol=0, upiCol=0, totalAmt=0;
+  filtered.forEach(d => {
+    if (d.status==='returned' || d.gasType==='-') { totalRet += d.quantity||0; }
+    else { totalDel += d.quantity||0; totalAmt += d.amount||0;
+      if (d.paymentMode==='UPI') upiCol += d.amount||0;
+      else cashCol += d.amount||0;
+    }
+  });
+
+  document.getElementById('reportStats').innerHTML = `
+    <div class="stat-card blue"><div class="stat-label">Deliveries</div><div class="stat-value">${totalDel}</div><div class="stat-sub">cylinders out</div></div>
+    <div class="stat-card green"><div class="stat-label">Returns</div><div class="stat-value">${totalRet}</div><div class="stat-sub">cylinders back</div></div>
+    <div class="stat-card orange"><div class="stat-label">Cash Collected</div><div class="stat-value">${fmtRupee(cashCol)}</div></div>
+    <div class="stat-card purple"><div class="stat-label">UPI Collected</div><div class="stat-value">${fmtRupee(upiCol)}</div></div>`;
+
+  // Breakdown table
+  const tbody = document.getElementById('reportBody');
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<div class="empty-state"><p>No deliveries in this period</p></div>';
+    return;
+  }
+  let rows = '<table><thead><tr><th>Date</th><th>Customer</th><th>Gas</th><th>Qty</th><th>Amount</th><th>Mode</th><th>Status</th></tr></thead><tbody>';
+  filtered.slice(0, 50).forEach(d => {
+    const badge = getOverdueBadge(d);
+    rows += `<tr>
+      <td>${fmtDate(d.createdAt)}</td><td>${esc(d.customerName||'')}</td>
+      <td>${esc(d.gasType||'-')}</td><td>${d.quantity||0}</td>
+      <td>${fmtRupee(d.amount)}</td><td>${d.paymentMode||'-'}</td>
+      <td><span class="badge ${badge}">${d.status||''}</span></td></tr>`;
+  });
+  rows += '</tbody></table>';
+  tbody.innerHTML = rows;
+}
+
+// ══════════════════════════════════════
+// INIT — load users for delivery table
+// ══════════════════════════════════════
+loadUsers();
+
+// ══════════════════════════════════════
+// PWA
+// ══════════════════════════════════════
+const manifest = {
+  name: "Usha Gases - Owner", short_name: "Owner",
+  start_url: "./owner-app.html", display: "standalone",
+  background_color: "#0f2a4a", theme_color: "#1d4ed8",
+  icons: [{ src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>⛽</text></svg>", sizes: "any", type: "image/svg+xml" }]
+};
+const mBlob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+const mLink = document.createElement('link'); mLink.rel='manifest'; mLink.href=URL.createObjectURL(mBlob);
+document.head.appendChild(mLink);
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('owner-sw.js').catch(()=>{});
+</script>
+</body>
+</html>
