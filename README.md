@@ -44,7 +44,7 @@ Stack: Vanilla JS · Firebase Realtime DB · PWA · Service Workers
 ### AI Content Detection Tool
 > Detects AI-generated text with interpretable signals. Built for editorial and compliance teams.
 
-[Source](https://github.com/utkarsh2k2)
+[Live Demo](https://utkarsh2k2.github.io/AIBlock/) · [Source](https://github.com/utkarsh2k2/AIBlock)
 
 ```
 Stack: Python · LLM APIs · NLP heuristics
@@ -58,7 +58,7 @@ Stack: Python · LLM APIs · NLP heuristics
 ### Modular Business Platform — Tier 2/3 India
 > Configurable BMS for small enterprises in underserved Indian markets. Low-bandwidth, mobile-first, built to scale across verticals.
 
-[Source](https://github.com/utkarsh2k2)
+[Live Demo](https://utkarsh2k2.github.io/claude-repos/worker-app.html) · [Source](https://github.com/utkarsh2k2/claude-repos)
 
 ```
 Stack: JS · Firebase · PWA · Modular config layer
@@ -70,9 +70,9 @@ Stack: JS · Firebase · PWA · Modular config layer
 ---
 
 ### Chikis & Home Bakery
-> Full-stack platform for a home bakery service — frontend storefront and backend order management.
+> Full-stack home bakery platform — React storefront with a Django backend.
 
-[Frontend](https://github.com/utkarsh2k2/chikis) · [Backend](https://github.com/utkarsh2k2/home-bakery)
+[Frontend (React)](https://github.com/utkarsh2k2/home-bakery) · [Backend (Django)](https://github.com/utkarsh2k2/chikis)
 
 ---
 
