@@ -30,8 +30,7 @@ I build production software that ships to real users in constrained environments
 ### Usha Medical & Industrial Gases — Business Management System
 > Multi-role PWA for a gas distribution business. Owner, Supervisor, and Worker dashboards with real-time Firebase sync and full offline support.
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-0d1117?style=flat-square&logo=googlechrome&logoColor=white)](https://utkarsh2k2.github.io/claude-repos/owner-app.html)
-[![Repo](https://img.shields.io/badge/Source-0d1117?style=flat-square&logo=github&logoColor=white)](https://github.com/utkarsh2k2/claude-repos)
+[Live Demo](https://utkarsh2k2.github.io/claude-repos/owner-app.html) · [Source](https://github.com/utkarsh2k2/claude-repos)
 
 ```
 Stack: Vanilla JS · Firebase Realtime DB · PWA · Service Workers
@@ -45,7 +44,7 @@ Stack: Vanilla JS · Firebase Realtime DB · PWA · Service Workers
 ### AI Content Detection Tool
 > Detects AI-generated text with interpretable signals. Built for editorial and compliance teams.
 
-[![Repo](https://img.shields.io/badge/Source-0d1117?style=flat-square&logo=github&logoColor=white)](https://github.com/utkarsh2k2)
+[Source](https://github.com/utkarsh2k2)
 
 ```
 Stack: Python · LLM APIs · NLP heuristics
@@ -59,7 +58,7 @@ Stack: Python · LLM APIs · NLP heuristics
 ### Modular Business Platform — Tier 2/3 India
 > Configurable BMS for small enterprises in underserved Indian markets. Low-bandwidth, mobile-first, built to scale across verticals.
 
-[![Repo](https://img.shields.io/badge/Source-0d1117?style=flat-square&logo=github&logoColor=white)](https://github.com/utkarsh2k2)
+[Source](https://github.com/utkarsh2k2)
 
 ```
 Stack: JS · Firebase · PWA · Modular config layer
@@ -73,8 +72,7 @@ Stack: JS · Firebase · PWA · Modular config layer
 ### Chikis & Home Bakery
 > Full-stack platform for a home bakery service — frontend storefront and backend order management.
 
-[![Frontend](https://img.shields.io/badge/Frontend-0d1117?style=flat-square&logo=github&logoColor=white)](https://github.com/utkarsh2k2/chikis)
-[![Backend](https://img.shields.io/badge/Backend-0d1117?style=flat-square&logo=github&logoColor=white)](https://github.com/utkarsh2k2/home-bakery)
+[Frontend](https://github.com/utkarsh2k2/chikis) · [Backend](https://github.com/utkarsh2k2/home-bakery)
 
 ---
 
