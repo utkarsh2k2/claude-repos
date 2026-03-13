@@ -1,30 +1,72 @@
 <div align="center">
 
-# utkarsh2k2
+```
+  ██╗   ██╗████████╗██╗  ██╗ █████╗ ██████╗ ███████╗██╗  ██╗
+  ██║   ██║╚══██╔══╝██║ ██╔╝██╔══██╗██╔══██╗██╔════╝██║  ██║
+  ██║   ██║   ██║   █████╔╝ ███████║██████╔╝███████╗███████║
+  ██║   ██║   ██║   ██╔═██╗ ██╔══██║██╔══██╗╚════██║██╔══██║
+  ╚██████╔╝   ██║   ██║  ██╗██║  ██║██║  ██║███████║██║  ██║
+   ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
+```
 
-**Software Engineer · 10 yrs · AI & Automation**
+**Full-Stack Engineer · 10 yrs · AI & Automation · Open to Work**
 
-[![Open to Work](https://img.shields.io/badge/Open%20to%20Work-available-brightgreen?style=flat-square&labelColor=0d1117)](mailto:utkarsh2k2@gmail.com)
+[![Email](https://img.shields.io/badge/utkarsh2k2%40gmail.com-0d1117?style=flat-square&logo=gmail&logoColor=EA4335)](mailto:utkarsh2k2@gmail.com)
+[![GitHub](https://img.shields.io/badge/github.com/utkarsh2k2-0d1117?style=flat-square&logo=github&logoColor=white)](https://github.com/utkarsh2k2)
+[![Open to Work](https://img.shields.io/badge/OPEN%20TO%20WORK-00C853?style=flat-square&labelColor=0d1117)](mailto:utkarsh2k2@gmail.com)
 
 </div>
 
 ---
 
-**Building production software that solves real problems** — from AI-powered tooling to offline-first business systems deployed in low-connectivity environments across India.
+I build production software that ships to real users in constrained environments — offline-first, mobile-first, low-bandwidth. A decade of full-stack experience, now focused on LLM integration, AI tooling, and scalable business platforms.
 
-- Decade of full-stack engineering; currently focused on LLM integration and automation pipelines
-- Ship fast, stay lean: pure JS when it's right, AI/cloud when it matters
-- Open to senior/lead roles in AI products, developer tooling, or platform engineering
+> Senior/Lead roles in **AI Products · Developer Tooling · Platform Engineering** — remote or hybrid, India-based.
 
 ---
 
-## Featured Projects
+## Projects
 
-| Project | Stack | Impact |
-|---|---|---|
-| **Usha Medical & Industrial Gases BMS** | HTML · Firebase · PWA | Multi-role offline-first business suite for gas distribution ops — owner, supervisor, and worker dashboards with real-time sync |
-| **AI Content Detection Tool** | Python · LLM APIs | Identifies AI-generated text with interpretable signals; built for editorial and compliance workflows |
-| **Modular BMS — Tier 2/3 India** | JS · Firebase · PWA | Configurable business management platform designed for low-bandwidth, mobile-first small enterprises in underserved markets |
+### Usha Medical & Industrial Gases — Business Management System
+> Multi-role PWA for a gas distribution business. Owner, Supervisor, and Worker dashboards with real-time Firebase sync and full offline support.
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-0d1117?style=flat-square&logo=googlechrome&logoColor=white)](https://utkarsh2k2.github.io/utkarsh2k2/)
+[![Repo](https://img.shields.io/badge/Source-0d1117?style=flat-square&logo=github&logoColor=white)](https://github.com/utkarsh2k2/utkarsh2k2)
+
+```
+Stack: Vanilla JS · Firebase Realtime DB · PWA · Service Workers
+```
+- Role-based access: Owner financials, Supervisor ops, Worker task tracking
+- Cylinder inventory, delivery logs, customer ledger — all offline-capable
+- Designed for a real business with zero tolerance for connectivity failures
+
+---
+
+### AI Content Detection Tool
+> Detects AI-generated text with interpretable signals. Built for editorial and compliance teams.
+
+[![Repo](https://img.shields.io/badge/Source-0d1117?style=flat-square&logo=github&logoColor=white)](https://github.com/utkarsh2k2)
+
+```
+Stack: Python · LLM APIs · NLP heuristics
+```
+- Goes beyond score output — surfaces *why* text is flagged
+- Designed for editorial, academic integrity, and compliance workflows
+- Integrates with OpenAI and open-source model backends
+
+---
+
+### Modular Business Platform — Tier 2/3 India
+> Configurable BMS for small enterprises in underserved Indian markets. Low-bandwidth, mobile-first, built to scale across verticals.
+
+[![Repo](https://img.shields.io/badge/Source-0d1117?style=flat-square&logo=github&logoColor=white)](https://github.com/utkarsh2k2)
+
+```
+Stack: JS · Firebase · PWA · Modular config layer
+```
+- Single codebase, multiple business types (retail, distribution, services)
+- Designed for 2G/3G networks and entry-level Android devices
+- Targets the 63M+ SMEs in India with zero viable digital tooling today
 
 ---
 
@@ -40,10 +82,22 @@
 
 ---
 
+## Stats
+
 <div align="center">
 
-**Available for senior/lead roles · Remote or Hybrid · India preferred**
+![GitHub Stats](https://github-readme-stats.vercel.app/api?username=utkarsh2k2&show_icons=true&theme=github_dark&hide_border=true&bg_color=0d1117&title_color=58a6ff&icon_color=58a6ff&text_color=8b949e&hide=contribs)
+&nbsp;
+![Top Languages](https://github-readme-stats.vercel.app/api/top-langs/?username=utkarsh2k2&layout=compact&theme=github_dark&hide_border=true&bg_color=0d1117&title_color=58a6ff&text_color=8b949e)
 
-`utkarsh2k2@gmail.com`
+</div>
+
+---
+
+<div align="center">
+
+**Senior/Lead · AI Products · Platform Engineering · Remote or Hybrid**
+
+[`utkarsh2k2@gmail.com`](mailto:utkarsh2k2@gmail.com)
 
 </div>
