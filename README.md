@@ -11,9 +11,7 @@
 
 **Full-Stack Engineer · 10 yrs · AI & Automation · Open to Work**
 
-[![Email](https://img.shields.io/badge/utkarsh2k2%40gmail.com-0d1117?style=flat-square&logo=gmail&logoColor=EA4335)](mailto:utkarsh2k2@gmail.com)
-[![GitHub](https://img.shields.io/badge/github.com/utkarsh2k2-0d1117?style=flat-square&logo=github&logoColor=white)](https://github.com/utkarsh2k2)
-[![Open to Work](https://img.shields.io/badge/OPEN%20TO%20WORK-00C853?style=flat-square&labelColor=0d1117)](mailto:utkarsh2k2@gmail.com)
+[utkarsh2k2@gmail.com](mailto:utkarsh2k2@gmail.com) · [github.com/utkarsh2k2](https://github.com/utkarsh2k2) · **Open to Work**
 
 </div>
 
