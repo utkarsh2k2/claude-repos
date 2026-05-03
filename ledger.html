@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Ledger — Usha Medical & Industrial Gases</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f1f5f9;color:#1e293b;min-height:100vh}
+
+header{background:linear-gradient(135deg,#0f2a4a 0%,#1d4ed8 100%);color:white;padding:0 20px;height:64px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(0,0,0,0.25);position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:40px;height:40px;background:rgba(255,255,255,0.18);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.logo-text h1{font-size:15px;font-weight:700}
+.logo-text p{font-size:11px;opacity:0.75;margin-top:1px}
+.header-actions{display:flex;gap:8px}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s;white-space:nowrap}
+.btn-primary{background:#1d4ed8;color:white}.btn-primary:hover{background:#1e40af}
+.btn-success{background:#16a34a;color:white}.btn-success:hover{background:#15803d}
+.btn-danger{background:#dc2626;color:white}.btn-danger:hover{background:#b91c1c}
+.btn-outline{background:white;color:#374151;border:1px solid #d1d5db}.btn-outline:hover{background:#f8fafc}
+.btn-ghost{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3)}.btn-ghost:hover{background:rgba(255,255,255,0.25)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-icon{width:32px;height:32px;padding:0;justify-content:center;border-radius:6px}
+
+main{padding:20px;max-width:1100px;margin:0 auto}
+
+/* Cards */
+.card{background:white;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.08);overflow:hidden;margin-bottom:16px}
+.card-header{padding:14px 18px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.card-title{font-size:14px;font-weight:700;color:#1e293b}
+.card-body{padding:18px}
+
+/* Customer selector */
+.cust-list{display:flex;flex-direction:column;gap:8px}
+.cust-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border:1px solid #e2e8f0;border-radius:10px;cursor:pointer;transition:all 0.15s}
+.cust-item:hover{border-color:#1d4ed8;background:#f0f7ff}
+.cust-item.selected{border-color:#1d4ed8;background:#eff6ff}
+.cust-name{font-weight:700;font-size:14px}
+.cust-meta{font-size:12px;color:#64748b;margin-top:2px}
+.cust-bal{font-weight:800;font-size:15px}
+.cust-bal.dr{color:#dc2626}
+.cust-bal.cr{color:#16a34a}
+
+/* Summary stats */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.stat{background:white;border-radius:10px;padding:14px 16px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-top:3px solid}
+.stat.blue{border-color:#1d4ed8}.stat.red{border-color:#dc2626}.stat.green{border-color:#16a34a}.stat.orange{border-color:#d97706}
+.stat-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:4px}
+.stat-val{font-size:22px;font-weight:800;color:#0f172a}
+
+/* Ledger table */
+.ledger-wrap{overflow-x:auto}
+.ledger-table{width:100%;border-collapse:collapse;font-size:13px}
+.ledger-table thead th{background:#f8fafc;padding:10px 12px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#64748b;border-bottom:2px solid #e2e8f0;white-space:nowrap}
+.ledger-table thead th.num{text-align:right}
+.ledger-table tbody td{padding:10px 12px;border-bottom:1px solid #f1f5f9;font-size:13px;vertical-align:middle}
+.ledger-table tbody tr:hover{background:#f8fafc}
+.ledger-table tbody tr:last-child td{border-bottom:none}
+.ledger-table td.num{text-align:right;font-variant-numeric:tabular-nums}
+.ledger-table td.dr-col{color:#dc2626;font-weight:600}
+.ledger-table td.cr-col{color:#16a34a;font-weight:600}
+.ledger-table td.bal-col{font-weight:700;color:#1e293b}
+.ledger-table .opening-row td{background:#fffbeb;font-weight:700;color:#92400e}
+.ledger-table .total-row td{background:#f8fafc;font-weight:700;border-top:2px solid #e2e8f0}
+
+/* Type badges */
+.type-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.type-bill{background:#dbeafe;color:#1e40af}
+.type-neft{background:#dcfce7;color:#15803d}
+.type-deposit{background:#f3e8ff;color:#7c3aed}
+.type-other{background:#f1f5f9;color:#475569}
+.type-cancel{background:#fee2e2;color:#dc2626}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,0.55);z-index:500;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal{background:white;border-radius:16px;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.3);animation:fadeIn 0.2s ease}
+@keyframes fadeIn{from{transform:translateY(-12px);opacity:0}to{transform:none;opacity:1}}
+.modal-header{padding:16px 20px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:white}
+.modal-title{font-size:16px;font-weight:700}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8;padding:2px 6px;border-radius:6px}
+.modal-close:hover{color:#1e293b;background:#f1f5f9}
+.modal-body{padding:20px}
+.modal-footer{padding:14px 20px;border-top:1px solid #f1f5f9;display:flex;justify-content:flex-end;gap:10px}
+
+/* Form */
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.4px}
+.form-input,.form-select{width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none;transition:border-color 0.15s,box-shadow 0.15s}
+.form-input:focus,.form-select:focus{border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,0.1)}
+.form-select{background:white;cursor:pointer}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.radio-group{display:flex;gap:12px}
+.radio-label{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;font-weight:600;padding:8px 14px;border:2px solid #e2e8f0;border-radius:8px;transition:all 0.15s}
+.radio-label:has(input:checked){border-color:#1d4ed8;background:#eff6ff;color:#1d4ed8}
+.radio-label.dr-radio:has(input:checked){border-color:#dc2626;background:#fef2f2;color:#dc2626}
+.radio-label.cr-radio:has(input:checked){border-color:#16a34a;background:#f0fdf4;color:#16a34a}
+.radio-label input{display:none}
+
+/* Customer add form */
+.add-cust-form{display:none;padding:16px;background:#f8fafc;border-radius:10px;margin-bottom:16px}
+.add-cust-form.visible{display:block}
+
+/* Search */
+.search-bar{display:flex;gap:10px;margin-bottom:14px}
+.search-input{flex:1;padding:9px 13px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none}
+.search-input:focus{border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,0.1)}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:600;z-index:1000;opacity:0;transition:opacity 0.3s;pointer-events:none}
+.toast.show{opacity:1}
+
+/* Empty */
+.empty{text-align:center;padding:36px;color:#94a3b8;font-size:14px}
+.empty-icon{font-size:36px;margin-bottom:8px}
+
+/* Tabs */
+.tabs{display:flex;border-bottom:2px solid #e2e8f0;margin-bottom:20px}
+.tab{padding:11px 18px;cursor:pointer;font-size:14px;font-weight:600;color:#64748b;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.15s;white-space:nowrap}
+.tab.active{color:#1d4ed8;border-bottom-color:#1d4ed8}
+
+/* Print */
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{background:white}
+  header,.no-print{display:none!important}
+  main{padding:0;max-width:none}
+  .card{box-shadow:none;border:1px solid #ddd}
+  .stats-row{display:grid!important}
+  .stat{border:1px solid #ddd}
+  .ledger-table thead th{background:#f0f0f0!important}
+  .ledger-table .opening-row td{background:#fffbeb!important}
+}
+
+@media(max-width:700px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  main{padding:12px}
+  .ledger-table thead th:nth-child(5),.ledger-table tbody td:nth-child(5){display:none}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">📒</div>
+    <div class="logo-text">
+      <h1>Customer Ledger</h1>
+      <p>Usha Medical &amp; Industrial Gases</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ Print</button>
+    <button class="btn btn-ghost btn-sm" onclick="location.href='usha-business-app.html'">← Back</button>
+  </div>
+</header>
+
+<main>
+  <div class="tabs no-print">
+    <div class="tab active" onclick="switchTab('ledger',this)">Ledger View</div>
+    <div class="tab" onclick="switchTab('customers',this)">All Customers</div>
+  </div>
+
+  <!-- ═══ LEDGER VIEW ═══ -->
+  <div id="tab-ledger">
+
+    <!-- Customer picker -->
+    <div class="card no-print">
+      <div class="card-header">
+        <span class="card-title">Select Customer</span>
+        <button class="btn btn-primary btn-sm" onclick="toggleAddCust()">+ New Customer</button>
+      </div>
+      <div class="card-body">
+        <div class="add-cust-form" id="addCustForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Customer Name *</label>
+              <input type="text" class="form-input" id="newCustName" placeholder="Full name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input type="tel" class="form-input" id="newCustPhone" placeholder="Mobile number">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Opening Balance (₹)</label>
+              <input type="number" class="form-input" id="newCustOB" placeholder="0" value="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Type</label>
+              <select class="form-select" id="newCustType">
+                <option>Industrial</option><option>Hospital</option><option>Retail</option><option>Construction</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-success btn-sm" onclick="addCustomer()">✓ Save Customer</button>
+            <button class="btn btn-outline btn-sm" onclick="toggleAddCust()">Cancel</button>
+          </div>
+        </div>
+        <div class="search-bar">
+          <input type="text" class="search-input" id="custSearch" placeholder="Search customers..." oninput="renderCustPicker()">
+        </div>
+        <div id="custPicker" class="cust-list"></div>
+      </div>
+    </div>
+
+    <!-- Ledger for selected customer -->
+    <div id="ledgerSection" style="display:none">
+
+      <!-- Customer header -->
+      <div class="card" id="printHeader">
+        <div class="card-header">
+          <div>
+            <div style="font-size:18px;font-weight:800" id="ledgerCustName">—</div>
+            <div style="font-size:12px;color:#64748b;margin-top:2px" id="ledgerCustMeta">—</div>
+          </div>
+          <div class="no-print" style="display:flex;gap:8px">
+            <button class="btn btn-primary btn-sm" onclick="openEntryModal()">+ Add Entry</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row" id="ledgerStats">
+        <div class="stat blue"><div class="stat-label">Total Billed (Dr)</div><div class="stat-val" id="sTotalDr">₹0</div></div>
+        <div class="stat green"><div class="stat-label">Total Received (Cr)</div><div class="stat-val" id="sTotalCr">₹0</div></div>
+        <div class="stat red"><div class="stat-label">Outstanding Balance</div><div class="stat-val" id="sBalance">₹0</div></div>
+        <div class="stat orange"><div class="stat-label">Total Entries</div><div class="stat-val" id="sEntries">0</div></div>
+      </div>
+
+      <!-- Ledger table -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Ledger Entries</span>
+          <div class="no-print" style="display:flex;gap:6px">
+            <select class="form-select" style="padding:6px 10px;font-size:12px;border-radius:6px" id="filterType" onchange="renderLedger()">
+              <option value="">All Types</option>
+              <option value="Bill">Bills</option>
+              <option value="NEFT">NEFT</option>
+              <option value="Deposit">Deposit</option>
+              <option value="Cancel">Cancel</option>
+            </select>
+          </div>
+        </div>
+        <div class="ledger-wrap">
+          <table class="ledger-table">
+            <thead>
+              <tr>
+                <th style="width:36px">#</th>
+                <th style="width:95px">Date</th>
+                <th>Particulars</th>
+                <th style="width:80px">Type</th>
+                <th class="num" style="width:110px">Dr (₹)</th>
+                <th class="num" style="width:110px">Cr (₹)</th>
+                <th class="num" style="width:120px">Balance (₹)</th>
+                <th class="no-print" style="width:60px"></th>
+              </tr>
+            </thead>
+            <tbody id="ledgerBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /ledgerSection -->
+  </div>
+
+  <!-- ═══ ALL CUSTOMERS ═══ -->
+  <div id="tab-customers" style="display:none">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">All Customers</span>
+        <button class="btn btn-primary btn-sm" onclick="switchTab('ledger',document.querySelector('.tab'));toggleAddCust()">+ New Customer</button>
+      </div>
+      <div class="card-body">
+        <div id="allCustList" class="cust-list"></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══ ADD ENTRY MODAL ═══ -->
+<div class="modal-overlay" id="entryModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="entryModalTitle">Add Ledger Entry</span>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Date *</label>
+          <input type="date" class="form-input" id="eDate">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-select" id="eType">
+            <option value="Bill">Bill</option>
+            <option value="NEFT">NEFT</option>
+            <option value="Deposit">Deposit</option>
+            <option value="Cancel">Cancel / Reversal</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Particulars / Bill No.</label>
+        <input type="text" class="form-input" id="eParticulars" placeholder="e.g. Bill No 8944 or NEFT received">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Dr / Cr *</label>
+        <div class="radio-group">
+          <label class="radio-label dr-radio">
+            <input type="radio" name="drCr" value="Dr" checked> Dr (Billed)
+          </label>
+          <label class="radio-label cr-radio">
+            <input type="radio" name="drCr" value="Cr"> Cr (Received)
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Amount (₹) *</label>
+        <input type="number" class="form-input" id="eAmount" placeholder="0.00" min="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Remarks</label>
+        <input type="text" class="form-input" id="eRemarks" placeholder="Optional notes">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEntry()" id="saveEntryBtn">Add Entry</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════
+// DATA STORE
+// ══════════════════════════════════════
+const STORE = 'usha_ledger_v2';
+let db = loadDB();
+
+function defaultDB(){
+  // Pre-load Shri Ravi Jautri Construction data from physical ledger
+  const custId = 'c1';
+  return {
+    customers: [{
+      id: custId,
+      name: 'Shri Ravi Jautri Construction',
+      phone: '',
+      type: 'Construction',
+      openingBalance: 38321,
+      deposit: 324000,
+      createdAt: '2024-10-01'
+    }],
+    entries: [
+      // ── Oct 2024 ──
+      {id:'e1',  custId, date:'2024-10-10', particulars:'Bill No 8733', type:'Bill',    drCr:'Dr', amount:9027,   remarks:''},
+      {id:'e2',  custId, date:'2024-10-17', particulars:'Bill No 8939', type:'Bill',    drCr:'Dr', amount:413,    remarks:''},
+      {id:'e3',  custId, date:'2024-10-17', particulars:'Bill No 8932', type:'Bill',    drCr:'Dr', amount:9027,   remarks:''},
+      {id:'e4',  custId, date:'2024-10-19', particulars:'NEFT',         type:'NEFT',    drCr:'Cr', amount:25000,  remarks:'Payment received'},
+      {id:'e5',  custId, date:'2024-10-19', particulars:'Bill',         type:'Bill',    drCr:'Dr', amount:9027,   remarks:''},
+      {id:'e6',  custId, date:'2024-10-25', particulars:'Bill No 8941', type:'Bill',    drCr:'Dr', amount:3481,   remarks:''},
+      {id:'e7',  custId, date:'2024-10-25', particulars:'NEFT',         type:'NEFT',    drCr:'Cr', amount:25000,  remarks:'Payment received'},
+      {id:'e8',  custId, date:'2024-10-26', particulars:'Bill No 8942', type:'Bill',    drCr:'Dr', amount:9027,   remarks:''},
+      // ── Nov 2024 ──
+      {id:'e9',  custId, date:'2024-11-03', particulars:'Bill No 8944', type:'Bill',    drCr:'Dr', amount:8496,   remarks:''},
+      {id:'e10', custId, date:'2024-11-11', particulars:'Bill No 8947', type:'Bill',    drCr:'Dr', amount:2395,   remarks:''},
+      {id:'e11', custId, date:'2024-11-11', particulars:'Bill No 8948', type:'Bill',    drCr:'Dr', amount:7470,   remarks:''},
+      {id:'e12', custId, date:'2024-11-13', particulars:'Bill No 8952', type:'Bill',    drCr:'Cr', amount:25000,  remarks:'Payment received'},
+      {id:'e13', custId, date:'2024-11-17', particulars:'Bill No 8951', type:'Bill',    drCr:'Dr', amount:3186,   remarks:''},
+      {id:'e14', custId, date:'2024-11-23', particulars:'NEFT',         type:'NEFT',    drCr:'Dr', amount:11682,  remarks:''},
+      {id:'e15', custId, date:'2024-11-23', particulars:'Bill No 8953', type:'Bill',    drCr:'Dr', amount:2600,   remarks:''},
+      {id:'e16', custId, date:'2024-11-23', particulars:'Bill No 8955', type:'Bill',    drCr:'Dr', amount:9558,   remarks:''},
+      {id:'e17', custId, date:'2024-11-23', particulars:'Bill No 8956', type:'Bill',    drCr:'Dr', amount:9558,   remarks:''},
+      {id:'e18', custId, date:'2024-11-29', particulars:'NEFT',         type:'NEFT',    drCr:'Cr', amount:35000,  remarks:'Payment received'},
+      // ── Dec 2024 ──
+      {id:'e19', custId, date:'2024-12-01', particulars:'Entry',        type:'Bill',    drCr:'Dr', amount:10620,  remarks:''},
+      {id:'e20', custId, date:'2024-12-09', particulars:'Bill',         type:'Bill',    drCr:'Dr', amount:9558,   remarks:''},
+      {id:'e21', custId, date:'2024-12-09', particulars:'Bill No 7929', type:'Bill',    drCr:'Dr', amount:300,    remarks:''},
+      {id:'e22', custId, date:'2024-12-13', particulars:'Bill No 7928', type:'Bill',    drCr:'Dr', amount:9239,   remarks:''},
+      {id:'e23', custId, date:'2024-12-13', particulars:'Bill No 7925', type:'Bill',    drCr:'Dr', amount:108000, remarks:''},
+      {id:'e24', custId, date:'2024-12-17', particulars:'Bill No 7924 — Deposit', type:'Deposit', drCr:'Cr', amount:30000, remarks:'Deposit received'},
+      {id:'e25', custId, date:'2024-12-24', particulars:'NEFT',         type:'NEFT',    drCr:'Dr', amount:3740,   remarks:''},
+      {id:'e26', custId, date:'2024-12-25', particulars:'Bill No 7930', type:'Bill',    drCr:'Dr', amount:6903,   remarks:''},
+      {id:'e27', custId, date:'2024-12-25', particulars:'Bill No 7931', type:'Bill',    drCr:'Dr', amount:8496,   remarks:''},
+      {id:'e28', custId, date:'2024-12-30', particulars:'Bill No 7933', type:'Bill',    drCr:'Dr', amount:8496,   remarks:''},
+      // ── Jan 2025 ──
+      {id:'e29', custId, date:'2025-01-04', particulars:'Bill No 7934', type:'Bill',    drCr:'Dr', amount:0,      remarks:'(verify amount)'},
+      {id:'e30', custId, date:'2025-01-04', particulars:'Cancel Bill 7924 — Deposit ₹1,08,000', type:'Cancel', drCr:'Cr', amount:108000, remarks:'Deposit cancelled/reversed'},
+      {id:'e31', custId, date:'2025-01-05', particulars:'Bill No 7936 — Deposit', type:'Deposit', drCr:'Dr', amount:60000, remarks:'New deposit'},
+      {id:'e32', custId, date:'2025-01-08', particulars:'NEFT (Deposit)', type:'NEFT', drCr:'Cr', amount:50000, remarks:'Payment received'},
+    ],
+    nextEntryId: 33,
+    nextCustId: 2
+  };
+}
+
+function loadDB(){
+  try{const raw=localStorage.getItem(STORE);if(raw)return JSON.parse(raw);}catch(e){}
+  const d=defaultDB();localStorage.setItem(STORE,JSON.stringify(d));return d;
+}
+function saveDB(){localStorage.setItem(STORE,JSON.stringify(db));}
+
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+let selectedCustId = 'c1'; // default to pre-loaded customer
+let editEntryId = null;
+
+// ══════════════════════════════════════
+// TABS
+// ══════════════════════════════════════
+function switchTab(name, tabEl){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-ledger').style.display='none';
+  document.getElementById('tab-customers').style.display='none';
+  if(tabEl)tabEl.classList.add('active');
+  document.getElementById('tab-'+name).style.display='block';
+  if(name==='customers')renderAllCustomers();
+  if(name==='ledger'){renderCustPicker();if(selectedCustId)showLedger(selectedCustId);}
+}
+
+// ══════════════════════════════════════
+// CUSTOMER PICKER
+// ══════════════════════════════════════
+function renderCustPicker(){
+  const q=(document.getElementById('custSearch').value||'').toLowerCase();
+  const el=document.getElementById('custPicker');
+  const custs=db.customers.filter(c=>!q||c.name.toLowerCase().includes(q));
+  if(!custs.length){el.innerHTML='<div class="empty">No customers found</div>';return;}
+  el.innerHTML=custs.map(c=>{
+    const bal=getBalance(c);
+    const balClass=bal>0?'dr':'cr';
+    const balSign=bal>0?'Dr':'Cr';
+    return `<div class="cust-item ${c.id===selectedCustId?'selected':''}" onclick="showLedger('${c.id}')">
+      <div>
+        <div class="cust-name">${esc(c.name)}</div>
+        <div class="cust-meta">${c.type}${c.phone?' · '+c.phone:''}</div>
+      </div>
+      <div class="cust-bal ${balClass}">₹${fmt(Math.abs(bal))} ${balSign}</div>
+    </div>`;
+  }).join('');
+}
+
+function getBalance(cust){
+  let bal=cust.openingBalance||0;
+  db.entries.filter(e=>e.custId===cust.id).forEach(e=>{
+    if(e.drCr==='Dr')bal+=parseFloat(e.amount)||0;
+    else bal-=parseFloat(e.amount)||0;
+  });
+  return bal;
+}
+
+// ══════════════════════════════════════
+// LEDGER VIEW
+// ══════════════════════════════════════
+function showLedger(custId){
+  selectedCustId=custId;
+  const cust=db.customers.find(c=>c.id===custId);
+  if(!cust)return;
+  document.getElementById('ledgerSection').style.display='block';
+  document.getElementById('ledgerCustName').textContent=cust.name;
+  document.getElementById('ledgerCustMeta').textContent=
+    (cust.type||'')+(cust.phone?' · '+cust.phone:'')+
+    (cust.deposit?' · Deposit: ₹'+fmt(cust.deposit):'');
+  renderCustPicker();
+  renderLedger();
+}
+
+function renderLedger(){
+  const cust=db.customers.find(c=>c.id===selectedCustId);
+  if(!cust)return;
+  const fType=document.getElementById('filterType').value;
+  let entries=db.entries.filter(e=>e.custId===selectedCustId);
+  if(fType)entries=entries.filter(e=>e.type===fType);
+  entries.sort((a,b)=>a.date.localeCompare(b.date)||(a.id.localeCompare(b.id)));
+
+  let runBal=cust.openingBalance||0;
+  let totalDr=0,totalCr=0;
+
+  const tbody=document.getElementById('ledgerBody');
+  let rows='';
+
+  // Opening balance row
+  if(cust.openingBalance){
+    rows+=`<tr class="opening-row">
+      <td colspan="4" style="font-weight:700;padding:10px 12px">📌 Opening Balance (brought forward)</td>
+      <td class="num"></td><td class="num"></td>
+      <td class="num bal-col">₹${fmt(cust.openingBalance)}</td>
+      <td class="no-print"></td>
+    </tr>`;
+  }
+
+  entries.forEach((e,i)=>{
+    const amt=parseFloat(e.amount)||0;
+    if(e.drCr==='Dr'){runBal+=amt;totalDr+=amt;}
+    else{runBal-=amt;totalCr+=amt;}
+    const badgeClass={Bill:'type-bill',NEFT:'type-neft',Deposit:'type-deposit',Cancel:'type-cancel',Other:'type-other'}[e.type]||'type-other';
+    const balColor=runBal>0?'#dc2626':'#16a34a';
+    rows+=`<tr>
+      <td style="color:#94a3b8;font-size:12px">${i+1}</td>
+      <td style="white-space:nowrap;font-size:12px">${fmtDate(e.date)}</td>
+      <td>
+        <div style="font-weight:600">${esc(e.particulars)}</div>
+        ${e.remarks?`<div style="font-size:11px;color:#94a3b8">${esc(e.remarks)}</div>`:''}
+      </td>
+      <td><span class="type-badge ${badgeClass}">${e.type}</span></td>
+      <td class="num dr-col">${e.drCr==='Dr'&&amt?'₹'+fmt(amt):''}</td>
+      <td class="num cr-col">${e.drCr==='Cr'&&amt?'₹'+fmt(amt):''}</td>
+      <td class="num bal-col" style="color:${balColor}">₹${fmt(Math.abs(runBal))} ${runBal>0?'Dr':'Cr'}</td>
+      <td class="no-print" style="white-space:nowrap">
+        <button class="btn btn-outline btn-icon btn-sm" title="Edit" onclick="editEntry('${e.id}')">✏️</button>
+        <button class="btn btn-danger btn-icon btn-sm" title="Delete" onclick="deleteEntry('${e.id}')" style="margin-left:4px">×</button>
+      </td>
+    </tr>`;
+  });
+
+  // Totals row
+  rows+=`<tr class="total-row">
+    <td colspan="4" style="text-align:right;padding-right:12px;font-weight:700">TOTAL</td>
+    <td class="num dr-col" style="font-size:14px">₹${fmt(totalDr)}</td>
+    <td class="num cr-col" style="font-size:14px">₹${fmt(totalCr)}</td>
+    <td class="num bal-col" style="font-size:14px;color:${runBal>0?'#dc2626':'#16a34a'}">₹${fmt(Math.abs(runBal))} ${runBal>0?'Dr':'Cr'}</td>
+    <td class="no-print"></td>
+  </tr>`;
+
+  tbody.innerHTML=rows;
+
+  // Stats
+  document.getElementById('sTotalDr').textContent='₹'+fmt(totalDr);
+  document.getElementById('sTotalCr').textContent='₹'+fmt(totalCr);
+  document.getElementById('sBalance').textContent='₹'+fmt(Math.abs(runBal))+(runBal>0?' Dr':' Cr');
+  document.getElementById('sBalance').style.color=runBal>0?'#dc2626':'#16a34a';
+  document.getElementById('sEntries').textContent=entries.length;
+}
+
+// ══════════════════════════════════════
+// ENTRY MODAL
+// ══════════════════════════════════════
+function openEntryModal(entryId=null){
+  editEntryId=entryId;
+  document.getElementById('entryModalTitle').textContent=entryId?'Edit Entry':'Add Entry';
+  document.getElementById('saveEntryBtn').textContent=entryId?'Save Changes':'Add Entry';
+  if(entryId){
+    const e=db.entries.find(x=>x.id===entryId);
+    if(!e)return;
+    document.getElementById('eDate').value=e.date;
+    document.getElementById('eType').value=e.type;
+    document.getElementById('eParticulars').value=e.particulars;
+    document.getElementById('eAmount').value=e.amount;
+    document.getElementById('eRemarks').value=e.remarks||'';
+    document.querySelector(`input[name=drCr][value="${e.drCr}"]`).checked=true;
+  } else {
+    document.getElementById('eDate').value=new Date().toISOString().slice(0,10);
+    document.getElementById('eType').value='Bill';
+    document.getElementById('eParticulars').value='';
+    document.getElementById('eAmount').value='';
+    document.getElementById('eRemarks').value='';
+    document.querySelector('input[name=drCr][value="Dr"]').checked=true;
+  }
+  document.getElementById('entryModal').classList.add('open');
+  setTimeout(()=>document.getElementById('eParticulars').focus(),100);
+}
+
+function editEntry(id){openEntryModal(id);}
+
+function saveEntry(){
+  const date=document.getElementById('eDate').value;
+  const particulars=document.getElementById('eParticulars').value.trim();
+  const amount=parseFloat(document.getElementById('eAmount').value)||0;
+  if(!date){showToast('Please select a date');return;}
+  if(!particulars){showToast('Please enter particulars');return;}
+  const entry={
+    id: editEntryId||('e'+db.nextEntryId++),
+    custId: selectedCustId,
+    date, particulars,
+    type: document.getElementById('eType').value,
+    drCr: document.querySelector('input[name=drCr]:checked').value,
+    amount,
+    remarks: document.getElementById('eRemarks').value.trim()
+  };
+  if(editEntryId){
+    const idx=db.entries.findIndex(e=>e.id===editEntryId);
+    if(idx>=0)db.entries[idx]=entry;
+  } else {
+    db.entries.push(entry);
+  }
+  saveDB();
+  closeModal();
+  renderLedger();
+  renderCustPicker();
+  showToast(editEntryId?'Entry updated!':'Entry added!');
+}
+
+function deleteEntry(id){
+  if(!confirm('Delete this entry?'))return;
+  db.entries=db.entries.filter(e=>e.id!==id);
+  saveDB();
+  renderLedger();
+  renderCustPicker();
+  showToast('Entry deleted.');
+}
+
+function closeModal(){
+  document.getElementById('entryModal').classList.remove('open');
+  editEntryId=null;
+}
+document.getElementById('entryModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('entryModal'))closeModal();
+});
+
+// ══════════════════════════════════════
+// ADD CUSTOMER
+// ══════════════════════════════════════
+function toggleAddCust(){
+  const f=document.getElementById('addCustForm');
+  f.classList.toggle('visible');
+}
+function addCustomer(){
+  const name=document.getElementById('newCustName').value.trim();
+  if(!name){showToast('Customer name required');return;}
+  const cust={
+    id:'c'+db.nextCustId++,
+    name,
+    phone:document.getElementById('newCustPhone').value.trim(),
+    type:document.getElementById('newCustType').value,
+    openingBalance:parseFloat(document.getElementById('newCustOB').value)||0,
+    createdAt:new Date().toISOString().slice(0,10)
+  };
+  db.customers.push(cust);
+  saveDB();
+  document.getElementById('newCustName').value='';
+  document.getElementById('newCustPhone').value='';
+  document.getElementById('newCustOB').value='0';
+  document.getElementById('addCustForm').classList.remove('visible');
+  renderCustPicker();
+  showLedger(cust.id);
+  showToast('Customer added!');
+}
+
+// ══════════════════════════════════════
+// ALL CUSTOMERS LIST
+// ══════════════════════════════════════
+function renderAllCustomers(){
+  const el=document.getElementById('allCustList');
+  if(!db.customers.length){el.innerHTML='<div class="empty"><div class="empty-icon">👥</div>No customers yet</div>';return;}
+  el.innerHTML=db.customers.map(c=>{
+    const bal=getBalance(c);
+    const entryCount=db.entries.filter(e=>e.custId===c.id).length;
+    return `<div class="cust-item" onclick="switchTab('ledger',document.querySelector('.tab'));showLedger('${c.id}')">
+      <div>
+        <div class="cust-name">${esc(c.name)}</div>
+        <div class="cust-meta">${c.type}${c.phone?' · '+c.phone:''} · ${entryCount} entries</div>
+      </div>
+      <div class="cust-bal ${bal>0?'dr':'cr'}">₹${fmt(Math.abs(bal))} ${bal>0?'Dr':'Cr'}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════
+function fmt(n){return Number(n).toLocaleString('en-IN',{minimumFractionDigits:0,maximumFractionDigits:0});}
+function fmtDate(d){
+  if(!d)return'';
+  const [y,m,day]=d.split('-');
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${day} ${months[parseInt(m)-1]} ${y.slice(2)}`;
+}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+renderCustPicker();
+if(selectedCustId)showLedger(selectedCustId);
+</script>
+</body>
+</html>
