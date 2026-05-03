@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tax Invoice — Usha Medical & Industrial Gases</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f1f5f9;color:#1e293b;min-height:100vh}
+
+/* ── Header ── */
+header{background:linear-gradient(135deg,#0f2a4a 0%,#1d4ed8 100%);color:white;padding:0 20px;height:64px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(0,0,0,0.25);position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:40px;height:40px;background:rgba(255,255,255,0.18);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.logo-text h1{font-size:15px;font-weight:700}
+.logo-text p{font-size:11px;opacity:0.75;margin-top:1px}
+.header-actions{display:flex;gap:8px}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s;white-space:nowrap}
+.btn-primary{background:#1d4ed8;color:white}
+.btn-primary:hover{background:#1e40af}
+.btn-success{background:#16a34a;color:white}
+.btn-success:hover{background:#15803d}
+.btn-outline{background:white;color:#374151;border:1px solid #d1d5db}
+.btn-outline:hover{background:#f8fafc}
+.btn-danger{background:#dc2626;color:white}
+.btn-danger:hover{background:#b91c1c}
+.btn-sm{padding:6px 10px;font-size:12px}
+.btn-ghost{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3)}
+.btn-ghost:hover{background:rgba(255,255,255,0.25)}
+
+/* ── Main layout ── */
+main{padding:20px;max-width:860px;margin:0 auto}
+
+/* ── Section card ── */
+.card{background:white;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.08);overflow:hidden;margin-bottom:16px}
+.card-header{padding:14px 18px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center}
+.card-title{font-size:14px;font-weight:700;color:#1e293b}
+.card-body{padding:18px}
+
+/* ── Form ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid.three{grid-template-columns:1fr 1fr 1fr}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-label{font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.4px}
+.form-input,.form-select{padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none;transition:border-color 0.15s,box-shadow 0.15s;width:100%}
+.form-input:focus,.form-select:focus{border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,0.1)}
+.form-select{background:white;cursor:pointer}
+.form-full{grid-column:1/-1}
+
+/* ── Items table ── */
+.items-table{width:100%;border-collapse:collapse;font-size:13px}
+.items-table th{background:#f8fafc;padding:9px 8px;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#64748b;border:1px solid #e2e8f0}
+.items-table td{padding:6px 6px;border:1px solid #e2e8f0;vertical-align:middle}
+.items-table td input{width:100%;border:none;outline:none;font-size:13px;text-align:center;background:transparent;padding:4px}
+.items-table td input:focus{background:#eff6ff;border-radius:4px}
+.items-table td.sno{text-align:center;color:#94a3b8;font-weight:600;width:36px}
+.items-table td.desc-cell input{text-align:left}
+.items-table .total-row td{background:#f8fafc;font-weight:700;font-size:13px}
+.items-table .words-row td{background:#fef9e7;font-style:italic;font-size:12px;color:#92400e}
+.add-row-btn{width:100%;padding:10px;border:2px dashed #e2e8f0;border-radius:8px;background:transparent;cursor:pointer;color:#94a3b8;font-size:13px;font-weight:600;transition:all 0.15s;margin-top:8px}
+.add-row-btn:hover{border-color:#1d4ed8;color:#1d4ed8;background:#eff6ff}
+.del-row{background:none;border:none;cursor:pointer;color:#e2e8f0;font-size:16px;padding:4px;border-radius:4px;transition:color 0.15s}
+.del-row:hover{color:#dc2626}
+
+/* ── Saved invoices list ── */
+.inv-list{display:flex;flex-direction:column;gap:8px}
+.inv-item{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;transition:all 0.15s}
+.inv-item:hover{border-color:#1d4ed8;background:#f0f7ff}
+.inv-item-left{display:flex;flex-direction:column;gap:2px}
+.inv-no{font-weight:700;font-size:14px;color:#1e293b}
+.inv-meta{font-size:12px;color:#64748b}
+.inv-amount{font-weight:700;font-size:15px;color:#1d4ed8}
+.empty-state{text-align:center;padding:32px;color:#94a3b8}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;z-index:1000;opacity:0;transition:opacity 0.3s;pointer-events:none}
+.toast.show{opacity:1}
+
+/* ── Tabs ── */
+.tabs{display:flex;border-bottom:2px solid #e2e8f0;margin-bottom:20px}
+.tab{padding:12px 20px;cursor:pointer;font-size:14px;font-weight:600;color:#64748b;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.15s}
+.tab.active{color:#1d4ed8;border-bottom-color:#1d4ed8}
+
+@media(max-width:600px){
+  .form-grid{grid-template-columns:1fr}
+  .form-grid.three{grid-template-columns:1fr 1fr}
+  main{padding:12px}
+  .items-table .hide-mob{display:none}
+}
+
+/* ════════════════════════════════
+   PRINT STYLES — matches physical form
+════════════════════════════════ */
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{background:white;font-family:Arial,sans-serif}
+  header,.no-print,.tabs,.app-ui{display:none!important}
+  main{padding:0;max-width:none;margin:0}
+  .print-invoice{display:block!important}
+  
+  .pi-page{
+    width:148mm;margin:0 auto;padding:4mm;
+    font-family:Arial,sans-serif;font-size:9pt;color:#000;
+    border:1.5px solid #1a3a7a;
+  }
+  .pi-topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2mm;font-size:7.5pt;color:#1a3a7a;font-weight:600}
+  .pi-co-name{text-align:center;font-size:15pt;font-weight:900;color:#1a3a7a;letter-spacing:-0.5px;margin-bottom:1mm}
+  .pi-address{text-align:center;font-size:7.5pt;color:#1a3a7a;margin-bottom:1mm}
+  .pi-dealer{text-align:center;font-size:7.5pt;color:#1a3a7a;border-top:1px solid #1a3a7a;border-bottom:1px solid #1a3a7a;padding:1mm 0;margin-bottom:2mm}
+  .pi-fields{display:grid;grid-template-columns:1fr 1fr;gap:1mm 4mm;margin-bottom:2mm;font-size:8pt}
+  .pi-field{display:flex;gap:2mm;align-items:baseline}
+  .pi-field-label{font-weight:700;color:#1a3a7a;white-space:nowrap;font-size:8pt}
+  .pi-field-val{border-bottom:1px dotted #666;flex:1;min-width:20mm;font-size:8pt}
+  
+  .pi-table{width:100%;border-collapse:collapse;margin-bottom:2mm}
+  .pi-table th,.pi-table td{border:1px solid #1a3a7a;padding:1mm 1.5mm;font-size:7.5pt;text-align:center}
+  .pi-table th{background:#dbeafe;color:#1a3a7a;font-weight:700;font-size:7pt}
+  .pi-table td.desc{text-align:left}
+  .pi-table .total-row td{font-weight:700;background:#f0f4ff}
+  
+  .pi-words{font-size:7.5pt;border-bottom:1px dotted #666;padding-bottom:1mm;margin-bottom:2mm}
+  .pi-words-label{font-weight:700;color:#1a3a7a}
+  
+  .pi-footer{font-size:6.5pt;border-top:1px solid #1a3a7a;padding-top:1.5mm;display:flex;justify-content:space-between;align-items:flex-end}
+  .pi-terms{flex:1}
+  .pi-terms p{margin-bottom:0.5mm}
+  .pi-sig{text-align:right;font-weight:700;color:#1a3a7a;font-size:7pt}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🧾</div>
+    <div class="logo-text">
+      <h1>Tax Invoice</h1>
+      <p>Usha Medical &amp; Industrial Gases</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ Print</button>
+    <button class="btn btn-ghost btn-sm" onclick="location.href='usha-business-app.html'">← Back</button>
+  </div>
+</header>
+
+<main>
+  <div class="app-ui no-print">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('new')">New Invoice</div>
+      <div class="tab" onclick="switchTab('saved')">Saved Invoices</div>
+    </div>
+
+    <!-- ── NEW INVOICE FORM ── -->
+    <div id="tab-new">
+
+      <!-- Header details -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Invoice Details</span>
+          <button class="btn btn-outline btn-sm" onclick="resetForm()">↺ Reset</button>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Invoice No.</label>
+              <input type="text" class="form-input" id="invNo" placeholder="e.g. 7297">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date</label>
+              <input type="date" class="form-input" id="invDate">
+            </div>
+            <div class="form-group form-full">
+              <label class="form-label">M/s (Customer Name)</label>
+              <input type="text" class="form-input" id="invMis" placeholder="Customer / Party name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mobile No.</label>
+              <input type="tel" class="form-input" id="invMob" placeholder="Customer phone">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Customer GSTIN</label>
+              <input type="text" class="form-input" id="invGstin" placeholder="GSTIN (if applicable)">
+            </div>
+            <div class="form-group form-full">
+              <label class="form-label">D.C. (Delivery Challan No.)</label>
+              <input type="text" class="form-input" id="invDC" placeholder="Delivery challan reference">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Items table -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Items</span>
+        </div>
+        <div class="card-body" style="overflow-x:auto;padding:12px">
+          <table class="items-table" id="itemsTable">
+            <thead>
+              <tr>
+                <th style="width:32px">S.N.</th>
+                <th style="min-width:140px">Description of Goods</th>
+                <th style="width:72px" class="hide-mob">HSN Code</th>
+                <th style="width:60px" class="hide-mob">GST %</th>
+                <th style="width:55px">Qty</th>
+                <th style="width:70px">Rate (₹)</th>
+                <th style="width:80px">Amount (₹)</th>
+                <th style="width:28px"></th>
+              </tr>
+            </thead>
+            <tbody id="itemsBody">
+            </tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td colspan="6" style="text-align:right;padding-right:10px">Total</td>
+                <td id="totalCell" style="text-align:center;font-weight:700">₹0.00</td>
+                <td></td>
+              </tr>
+              <tr class="words-row">
+                <td colspan="8" style="padding:6px 8px">
+                  <strong>In Words:</strong> <span id="wordsCell">Zero Only</span>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+          <button class="add-row-btn" onclick="addRow()">+ Add Item</button>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="no-print" style="display:flex;gap:10px;justify-content:flex-end;margin-bottom:24px">
+        <button class="btn btn-outline" onclick="resetForm()">↺ Reset</button>
+        <button class="btn btn-success" onclick="saveInvoice()">💾 Save Invoice</button>
+        <button class="btn btn-primary" onclick="window.print()">🖨️ Print Invoice</button>
+      </div>
+
+    </div><!-- /tab-new -->
+
+    <!-- ── SAVED INVOICES ── -->
+    <div id="tab-saved" style="display:none">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Saved Invoices</span>
+        </div>
+        <div class="card-body">
+          <div class="inv-list" id="savedList"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /app-ui -->
+
+  <!-- ════════ PRINT TEMPLATE ════════ -->
+  <div class="print-invoice" style="display:none" id="printArea">
+    <div class="pi-page">
+      <div class="pi-topbar">
+        <span>GSTIN- 23AZRPS5140B1ZG</span>
+        <span style="font-weight:900;font-size:9pt">Tax Invoice</span>
+        <span>Mob.: 7709039453 / 9479719365</span>
+      </div>
+      <div class="pi-co-name">USHA MEDICAL &amp; INDUSTRIAL GASES</div>
+      <div class="pi-address">Address- Jr. MIG No. 4, Hedgewar Nagar, Baldev Optics Road, Near Sirmour Chowk, Rewa, MP</div>
+      <div class="pi-dealer">Authorised Dealer : Industrial Gases, Welding Electrode, C.A. Carbide<br>Welding Rods, All Welding Accessories &amp; General Orders</div>
+      <div class="pi-fields">
+        <div class="pi-field"><span class="pi-field-label">Invoice No.</span><span class="pi-field-val" id="p-invNo"></span></div>
+        <div class="pi-field"><span class="pi-field-label">Date</span><span class="pi-field-val" id="p-date"></span></div>
+        <div class="pi-field"><span class="pi-field-label">M/s</span><span class="pi-field-val" id="p-mis"></span></div>
+        <div class="pi-field"><span class="pi-field-label">Mob. No.</span><span class="pi-field-val" id="p-mob"></span></div>
+        <div class="pi-field"><span class="pi-field-label">GSTIN -</span><span class="pi-field-val" id="p-gstin"></span></div>
+        <div class="pi-field"><span class="pi-field-label">D.C.</span><span class="pi-field-val" id="p-dc"></span></div>
+      </div>
+      <table class="pi-table">
+        <thead>
+          <tr>
+            <th style="width:20px">S.<br>No.</th>
+            <th>Description of goods</th>
+            <th style="width:40px">HSN<br>Code</th>
+            <th style="width:30px">GST<br>Rate</th>
+            <th style="width:25px">Qty.</th>
+            <th style="width:35px">Rate</th>
+            <th style="width:42px">Amount<br>Rs.&nbsp;&nbsp;&nbsp;P.</th>
+          </tr>
+        </thead>
+        <tbody id="p-items"></tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td colspan="6" style="text-align:right;font-weight:700;color:#1a3a7a">Total</td>
+            <td id="p-total"></td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="pi-words"><span class="pi-words-label">In Words Rs. </span><span id="p-words"></span></div>
+      <div class="pi-footer">
+        <div class="pi-terms">
+          <p>1- Intrest @24% P.A. Wi;; Be claimed if the Bill. is not paid with in 15 days.</p>
+          <p>2- Goods once sold will not be taken back.</p>
+          <p>3- In case of any dispute Rewa Jurisdiction will prevail.</p>
+        </div>
+        <div class="pi-sig">For :- USHA MEDICAL &amp; INDUSTRIAL GASES</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Storage ──
+const STORE = 'usha_invoices';
+let invoices = JSON.parse(localStorage.getItem(STORE) || '[]');
+
+function saveToStore(){localStorage.setItem(STORE,JSON.stringify(invoices));}
+
+// ── Tab switching ──
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-new').style.display = t==='new'?'block':'none';
+  document.getElementById('tab-saved').style.display = t==='saved'?'block':'none';
+  if(t==='saved') renderSaved();
+}
+
+// ── Row management ──
+let rowId=0;
+function addRow(){
+  const tbody=document.getElementById('itemsBody');
+  const tr=document.createElement('tr');
+  const sno=tbody.rows.length+1;
+  tr.dataset.rid=++rowId;
+  tr.innerHTML=`
+    <td class="sno">${sno}</td>
+    <td class="desc-cell"><input type="text" placeholder="Description" oninput="calcTotal()"></td>
+    <td class="hide-mob"><input type="text" placeholder="HSN" oninput="calcTotal()"></td>
+    <td class="hide-mob"><input type="text" placeholder="%" oninput="calcTotal()"></td>
+    <td><input type="number" placeholder="0" min="0" oninput="calcTotal()"></td>
+    <td><input type="number" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></td>
+    <td><input type="number" placeholder="0.00" readonly style="background:#f8fafc;font-weight:600;color:#1d4ed8"></td>
+    <td><button class="del-row" onclick="delRow(this,${rowId})">×</button></td>
+  `;
+  // auto-calc amount when qty/rate changes
+  const inputs=tr.querySelectorAll('input[type=number]');
+  inputs[0].addEventListener('input',()=>autoCalcRow(tr));
+  inputs[1].addEventListener('input',()=>autoCalcRow(tr));
+  tbody.appendChild(tr);
+  renumberRows();
+  tr.querySelector('input[type=text]').focus();
+}
+function autoCalcRow(tr){
+  const nums=tr.querySelectorAll('input[type=number]');
+  const qty=parseFloat(nums[0].value)||0;
+  const rate=parseFloat(nums[1].value)||0;
+  nums[2].value=(qty*rate).toFixed(2);
+  calcTotal();
+}
+function delRow(btn,id){
+  btn.closest('tr').remove();
+  renumberRows();
+  calcTotal();
+}
+function renumberRows(){
+  document.querySelectorAll('#itemsBody tr').forEach((tr,i)=>{
+    tr.querySelector('.sno').textContent=i+1;
+  });
+}
+function calcTotal(){
+  let total=0;
+  document.querySelectorAll('#itemsBody tr').forEach(tr=>{
+    const v=parseFloat(tr.querySelectorAll('input[type=number]')[2]?.value)||0;
+    total+=v;
+  });
+  document.getElementById('totalCell').textContent='₹'+total.toFixed(2);
+  document.getElementById('wordsCell').textContent=numToWords(total)+' Only';
+}
+
+// ── Number to words ──
+function numToWords(n){
+  const ones=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+  const tens=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+  if(n===0)return'Zero';
+  function h(n){
+    if(n===0)return'';
+    if(n<20)return ones[n]+' ';
+    if(n<100)return tens[Math.floor(n/10)]+' '+(n%10?ones[n%10]+' ':'');
+    return ones[Math.floor(n/100)]+'Hundred '+(n%100?h(n%100):'');
+  }
+  const int=Math.floor(n);
+  const dec=Math.round((n-int)*100);
+  let res='';
+  if(int>=100000)res+=h(Math.floor(int/100000))+'Lakh ';
+  if(int>=1000)res+=h(Math.floor((int%100000)/1000))+'Thousand ';
+  res+=h(int%1000);
+  if(dec)res+='and Paise '+h(dec);
+  return res.trim();
+}
+
+// ── Reset ──
+function resetForm(){
+  document.getElementById('invNo').value='';
+  document.getElementById('invDate').value=new Date().toISOString().slice(0,10);
+  document.getElementById('invMis').value='';
+  document.getElementById('invMob').value='';
+  document.getElementById('invGstin').value='';
+  document.getElementById('invDC').value='';
+  document.getElementById('itemsBody').innerHTML='';
+  calcTotal();
+  addRow();
+}
+
+// ── Save ──
+function saveInvoice(){
+  const invNo=document.getElementById('invNo').value.trim();
+  if(!invNo){showToast('Please enter an Invoice No.');return;}
+  const mis=document.getElementById('invMis').value.trim();
+  if(!mis){showToast('Please enter customer name (M/s).');return;}
+  const items=[];
+  document.querySelectorAll('#itemsBody tr').forEach((tr,i)=>{
+    const ins=tr.querySelectorAll('input');
+    items.push({
+      sno:i+1,
+      desc:ins[0].value,
+      hsn:ins[1]?.value||'',
+      gst:ins[2]?.value||'',
+      qty:ins[3]?.value||'',  // adjusted for visible inputs
+      rate:ins[4]?.value||'',
+      amount:ins[5]?.value||'0'
+    });
+  });
+  // re-read correctly from numbered inputs
+  const rows=[];
+  document.querySelectorAll('#itemsBody tr').forEach((tr,i)=>{
+    const textIns=tr.querySelectorAll('input[type=text]');
+    const numIns=tr.querySelectorAll('input[type=number]');
+    rows.push({sno:i+1,desc:textIns[0]?.value||'',hsn:textIns[1]?.value||'',gst:textIns[2]?.value||'',qty:numIns[0]?.value||'',rate:numIns[1]?.value||'',amount:numIns[2]?.value||'0'});
+  });
+  let total=rows.reduce((s,r)=>s+(parseFloat(r.amount)||0),0);
+  const inv={
+    id:Date.now(),
+    invNo,
+    date:document.getElementById('invDate').value,
+    mis,
+    mob:document.getElementById('invMob').value,
+    gstin:document.getElementById('invGstin').value,
+    dc:document.getElementById('invDC').value,
+    rows,
+    total
+  };
+  const idx=invoices.findIndex(x=>x.invNo===invNo);
+  if(idx>=0)invoices[idx]=inv; else invoices.unshift(inv);
+  saveToStore();
+  showToast('Invoice #'+invNo+' saved!');
+}
+
+// ── Load invoice into form ──
+function loadInvoice(inv){
+  document.getElementById('invNo').value=inv.invNo;
+  document.getElementById('invDate').value=inv.date;
+  document.getElementById('invMis').value=inv.mis;
+  document.getElementById('invMob').value=inv.mob;
+  document.getElementById('invGstin').value=inv.gstin;
+  document.getElementById('invDC').value=inv.dc;
+  document.getElementById('itemsBody').innerHTML='';
+  inv.rows.forEach(r=>{
+    addRow();
+    const tr=document.getElementById('itemsBody').lastElementChild;
+    const textIns=tr.querySelectorAll('input[type=text]');
+    const numIns=tr.querySelectorAll('input[type=number]');
+    if(textIns[0])textIns[0].value=r.desc;
+    if(textIns[1])textIns[1].value=r.hsn;
+    if(textIns[2])textIns[2].value=r.gst;
+    if(numIns[0])numIns[0].value=r.qty;
+    if(numIns[1])numIns[1].value=r.rate;
+    if(numIns[2]){numIns[2].value=r.amount;}
+  });
+  calcTotal();
+  switchTab('new');
+  document.querySelector('.tab').classList.add('active');
+  document.querySelectorAll('.tab')[1].classList.remove('active');
+}
+
+// ── Render saved ──
+function renderSaved(){
+  const el=document.getElementById('savedList');
+  if(!invoices.length){el.innerHTML='<div class="empty-state">📄 No saved invoices yet</div>';return;}
+  el.innerHTML=invoices.map(inv=>`
+    <div class="inv-item" onclick="loadInvoice(${JSON.stringify(inv).replace(/"/g,'&quot;')})">
+      <div class="inv-item-left">
+        <span class="inv-no">Invoice #${inv.invNo}</span>
+        <span class="inv-meta">${inv.mis} · ${inv.date}</span>
+      </div>
+      <span class="inv-amount">₹${parseFloat(inv.total).toLocaleString('en-IN',{minimumFractionDigits:2})}</span>
+    </div>
+  `).join('');
+}
+
+// ── Build print area before printing ──
+window.addEventListener('beforeprint',buildPrint);
+function buildPrint(){
+  document.getElementById('p-invNo').textContent=document.getElementById('invNo').value||'__________';
+  document.getElementById('p-date').textContent=document.getElementById('invDate').value||'__________';
+  document.getElementById('p-mis').textContent=document.getElementById('invMis').value||'__________';
+  document.getElementById('p-mob').textContent=document.getElementById('invMob').value||'__________';
+  document.getElementById('p-gstin').textContent=document.getElementById('invGstin').value||'__________';
+  document.getElementById('p-dc').textContent=document.getElementById('invDC').value||'__________';
+  const tbody=document.getElementById('p-items');
+  tbody.innerHTML='';
+  let total=0;
+  document.querySelectorAll('#itemsBody tr').forEach((tr,i)=>{
+    const textIns=tr.querySelectorAll('input[type=text]');
+    const numIns=tr.querySelectorAll('input[type=number]');
+    const amt=parseFloat(numIns[2]?.value)||0;
+    total+=amt;
+    tbody.innerHTML+=`<tr>
+      <td>${i+1}</td>
+      <td class="desc">${textIns[0]?.value||''}</td>
+      <td>${textIns[1]?.value||''}</td>
+      <td>${textIns[2]?.value||''}</td>
+      <td>${numIns[0]?.value||''}</td>
+      <td>${numIns[1]?.value||''}</td>
+      <td>${amt?amt.toFixed(2):''}</td>
+    </tr>`;
+  });
+  // pad empty rows
+  const rowCount=document.querySelectorAll('#itemsBody tr').length;
+  for(let i=rowCount;i<8;i++){
+    tbody.innerHTML+=`<tr><td>${i+1}</td><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>`;
+  }
+  document.getElementById('p-total').textContent=total?'₹'+total.toFixed(2):'';
+  document.getElementById('p-words').textContent=total?numToWords(total)+' Only':'';
+  document.getElementById('printArea').style.display='block';
+}
+window.addEventListener('afterprint',()=>{
+  document.getElementById('printArea').style.display='none';
+});
+
+// ── Toast ──
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ── Init ──
+document.getElementById('invDate').value=new Date().toISOString().slice(0,10);
+addRow();
+</script>
+</body>
+</html>

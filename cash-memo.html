@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cash Memo — Usha Medical & Industrial Gases</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f1f5f9;color:#1e293b;min-height:100vh}
+
+/* ── Header ── */
+header{background:linear-gradient(135deg,#0f2a4a 0%,#1d4ed8 100%);color:white;padding:0 20px;height:64px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(0,0,0,0.25);position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:40px;height:40px;background:rgba(255,255,255,0.18);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.logo-text h1{font-size:15px;font-weight:700}
+.logo-text p{font-size:11px;opacity:0.75;margin-top:1px}
+.header-actions{display:flex;gap:8px}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s;white-space:nowrap}
+.btn-primary{background:#1d4ed8;color:white}
+.btn-primary:hover{background:#1e40af}
+.btn-success{background:#16a34a;color:white}
+.btn-success:hover{background:#15803d}
+.btn-outline{background:white;color:#374151;border:1px solid #d1d5db}
+.btn-outline:hover{background:#f8fafc}
+.btn-sm{padding:6px 10px;font-size:12px}
+.btn-ghost{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3)}
+.btn-ghost:hover{background:rgba(255,255,255,0.25)}
+
+/* ── Main layout ── */
+main{padding:20px;max-width:700px;margin:0 auto}
+
+/* ── Cards ── */
+.card{background:white;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.08);overflow:hidden;margin-bottom:16px}
+.card-header{padding:14px 18px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center}
+.card-title{font-size:14px;font-weight:700;color:#1e293b}
+.card-body{padding:18px}
+
+/* ── Form ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-label{font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.4px}
+.form-input,.form-select{padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none;transition:border-color 0.15s,box-shadow 0.15s;width:100%}
+.form-input:focus{border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,0.1)}
+.form-full{grid-column:1/-1}
+
+/* ── Items table ── */
+.items-table{width:100%;border-collapse:collapse;font-size:13px}
+.items-table th{background:#f8fafc;padding:9px 8px;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#64748b;border:1px solid #e2e8f0}
+.items-table td{padding:6px 6px;border:1px solid #e2e8f0;vertical-align:middle}
+.items-table td input{width:100%;border:none;outline:none;font-size:13px;text-align:center;background:transparent;padding:4px}
+.items-table td input:focus{background:#eff6ff;border-radius:4px}
+.items-table td.sno{text-align:center;color:#94a3b8;font-weight:600;width:36px}
+.items-table td.part-cell input{text-align:left}
+.items-table .total-row td{background:#f8fafc;font-weight:700}
+.items-table .footer-row td{background:#fef9e7}
+.add-row-btn{width:100%;padding:10px;border:2px dashed #e2e8f0;border-radius:8px;background:transparent;cursor:pointer;color:#94a3b8;font-size:13px;font-weight:600;transition:all 0.15s;margin-top:8px}
+.add-row-btn:hover{border-color:#1d4ed8;color:#1d4ed8;background:#eff6ff}
+.del-row{background:none;border:none;cursor:pointer;color:#e2e8f0;font-size:16px;padding:4px;border-radius:4px;transition:color 0.15s}
+.del-row:hover{color:#dc2626}
+
+/* ── Empty cyl row ── */
+.empty-cyl-row{display:flex;align-items:center;gap:10px;padding:10px 0}
+.empty-cyl-label{font-size:13px;font-weight:700;color:#374151;white-space:nowrap}
+.empty-cyl-input{padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none;width:120px}
+.empty-cyl-input:focus{border-color:#1d4ed8}
+
+/* ── Saved list ── */
+.inv-list{display:flex;flex-direction:column;gap:8px}
+.inv-item{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;transition:all 0.15s}
+.inv-item:hover{border-color:#1d4ed8;background:#f0f7ff}
+.inv-item-left{display:flex;flex-direction:column;gap:2px}
+.inv-no{font-weight:700;font-size:14px;color:#1e293b}
+.inv-meta{font-size:12px;color:#64748b}
+.inv-amount{font-weight:700;font-size:15px;color:#1d4ed8}
+.empty-state{text-align:center;padding:32px;color:#94a3b8}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;z-index:1000;opacity:0;transition:opacity 0.3s;pointer-events:none}
+.toast.show{opacity:1}
+
+/* ── Tabs ── */
+.tabs{display:flex;border-bottom:2px solid #e2e8f0;margin-bottom:20px}
+.tab{padding:12px 20px;cursor:pointer;font-size:14px;font-weight:600;color:#64748b;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.15s}
+.tab.active{color:#1d4ed8;border-bottom-color:#1d4ed8}
+
+@media(max-width:600px){
+  .form-grid{grid-template-columns:1fr}
+  main{padding:12px}
+}
+
+/* ════════════════════════════════
+   PRINT STYLES — matches yellow physical form
+════════════════════════════════ */
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{background:white;font-family:Arial,sans-serif}
+  header,.no-print,.tabs,.app-ui{display:none!important}
+  main{padding:0;max-width:none;margin:0}
+  .print-memo{display:block!important}
+
+  .pm-page{
+    width:130mm;margin:0 auto;padding:4mm;
+    font-family:Arial,sans-serif;font-size:9pt;color:#000;
+    border:1.5px solid #1a5e20;
+    background:#fffff0;
+  }
+  .pm-topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2mm;font-size:7.5pt;color:#1a5e20;font-weight:600}
+  .pm-co-name{text-align:center;font-size:13pt;font-weight:900;color:#1a5e20;letter-spacing:-0.3px;margin-bottom:1mm}
+  .pm-address{text-align:center;font-size:7pt;color:#1a5e20;margin-bottom:1mm}
+  .pm-dealer{text-align:center;font-size:7pt;color:#1a5e20;border-top:1px solid #1a5e20;border-bottom:1px solid #1a5e20;padding:1mm 0;margin-bottom:2mm}
+  
+  .pm-fields{display:grid;grid-template-columns:1fr 1fr;gap:1mm 4mm;margin-bottom:2mm;font-size:8pt}
+  .pm-field{display:flex;gap:2mm;align-items:baseline}
+  .pm-field-label{font-weight:700;color:#1a5e20;white-space:nowrap;font-size:8pt}
+  .pm-field-val{border-bottom:1px dotted #555;flex:1;min-width:20mm;font-size:8pt}
+  .pm-field-full{grid-column:1/-1}
+  
+  .pm-table{width:100%;border-collapse:collapse;margin-bottom:2mm}
+  .pm-table th,.pm-table td{border:1px solid #1a5e20;padding:1mm 1.5mm;font-size:7.5pt;text-align:center}
+  .pm-table th{background:#c8e6c9;color:#1a5e20;font-weight:700;font-size:7pt}
+  .pm-table td.part{text-align:left}
+  .pm-table .cyl-row td{background:#e8f5e9;font-weight:700;text-align:left;padding-left:2mm}
+  .pm-table .total-row td{font-weight:700;background:#c8e6c9}
+
+  .pm-footer{font-size:6.5pt;border-top:1px solid #1a5e20;padding-top:1.5mm;display:flex;justify-content:space-between;align-items:flex-end;margin-top:2mm}
+  .pm-notes{flex:1}
+  .pm-notes p{margin-bottom:0.5mm}
+  .pm-sig{text-align:right;font-weight:700;color:#1a5e20;font-size:8pt;border-top:1px solid #1a5e20;padding-top:1mm;min-width:30mm;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🟡</div>
+    <div class="logo-text">
+      <h1>Cash Memo</h1>
+      <p>Usha Medical &amp; Industrial Gases</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ Print</button>
+    <button class="btn btn-ghost btn-sm" onclick="location.href='usha-business-app.html'">← Back</button>
+  </div>
+</header>
+
+<main>
+  <div class="app-ui no-print">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('new')">New Memo</div>
+      <div class="tab" onclick="switchTab('saved')">Saved Memos</div>
+    </div>
+
+    <!-- ── NEW MEMO FORM ── -->
+    <div id="tab-new">
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Memo Details</span>
+          <button class="btn btn-outline btn-sm" onclick="resetForm()">↺ Reset</button>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Memo No.</label>
+              <input type="text" class="form-input" id="memoNo" placeholder="e.g. 7689">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date</label>
+              <input type="date" class="form-input" id="memoDate">
+            </div>
+            <div class="form-group form-full">
+              <label class="form-label">Customer Name</label>
+              <input type="text" class="form-input" id="memoName" placeholder="Customer / Party name">
+            </div>
+            <div class="form-group form-full">
+              <label class="form-label">Challan No.</label>
+              <input type="text" class="form-input" id="memoChallan" placeholder="Challan / DC reference">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Items table -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Items</span>
+        </div>
+        <div class="card-body" style="overflow-x:auto;padding:12px">
+          <table class="items-table" id="itemsTable">
+            <thead>
+              <tr>
+                <th style="width:36px">S.No.</th>
+                <th style="min-width:160px">Particulars</th>
+                <th style="width:60px">Qty</th>
+                <th style="width:75px">Rate (₹)</th>
+                <th style="width:85px">Amount (₹)</th>
+                <th style="width:28px"></th>
+              </tr>
+            </thead>
+            <tbody id="itemsBody"></tbody>
+            <tfoot>
+              <tr class="footer-row">
+                <td colspan="3" style="padding:6px 8px">
+                  <div class="empty-cyl-row">
+                    <span class="empty-cyl-label">Empty Cyl.:</span>
+                    <input type="text" class="empty-cyl-input" id="emptyCyl" placeholder="Qty / details">
+                  </div>
+                </td>
+                <td style="text-align:right;font-weight:700;padding-right:8px">Total</td>
+                <td id="totalCell" style="text-align:center;font-weight:700;font-size:14px">₹0.00</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+          <button class="add-row-btn" onclick="addRow()">+ Add Item</button>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="no-print" style="display:flex;gap:10px;justify-content:flex-end;margin-bottom:24px">
+        <button class="btn btn-outline" onclick="resetForm()">↺ Reset</button>
+        <button class="btn btn-success" onclick="saveMemo()">💾 Save Memo</button>
+        <button class="btn btn-primary" onclick="window.print()">🖨️ Print Memo</button>
+      </div>
+
+    </div><!-- /tab-new -->
+
+    <!-- ── SAVED MEMOS ── -->
+    <div id="tab-saved" style="display:none">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Saved Cash Memos</span>
+        </div>
+        <div class="card-body">
+          <div class="inv-list" id="savedList"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /app-ui -->
+
+  <!-- ════════ PRINT TEMPLATE ════════ -->
+  <div class="print-memo" style="display:none" id="printArea">
+    <div class="pm-page">
+      <div class="pm-topbar">
+        <span>GSTIN- 23AZRPS5140B1ZG</span>
+        <span style="font-weight:900;font-size:9pt">Cash Memo</span>
+        <span>Mob.: 7709039453 / 9479719365</span>
+      </div>
+      <div class="pm-co-name">USHA MEDICAL &amp; INDUSTRIAL GASES</div>
+      <div class="pm-address">Address- Jr. MIG No. 4, Hedgewar Nagar, Baldev Optics Road, Near Sirmour Chowk, Rewa</div>
+      <div class="pm-dealer">Authorised Dealer : Industrial Gases, Welding Electrode, C.A. Carbide<br>Welding Rods, All Welding Accessories &amp; General Orders</div>
+      <div class="pm-fields">
+        <div class="pm-field"><span class="pm-field-label">No.</span><span class="pm-field-val" id="p-memoNo"></span></div>
+        <div class="pm-field"><span class="pm-field-label">Date</span><span class="pm-field-val" id="p-date"></span></div>
+        <div class="pm-field pm-field-full"><span class="pm-field-label">Name</span><span class="pm-field-val" id="p-name" style="min-width:60mm"></span></div>
+        <div class="pm-field pm-field-full"><span class="pm-field-label">Challan No.</span><span class="pm-field-val" id="p-challan" style="min-width:60mm"></span></div>
+      </div>
+      <table class="pm-table">
+        <thead>
+          <tr>
+            <th style="width:18px">S.<br>No.</th>
+            <th>Particulars</th>
+            <th style="width:25px">Qty.</th>
+            <th style="width:32px">Rate</th>
+            <th style="width:40px">Amount<br>Rs.&nbsp;&nbsp;P.</th>
+          </tr>
+        </thead>
+        <tbody id="p-items"></tbody>
+        <tfoot>
+          <tr class="cyl-row">
+            <td colspan="3"><strong>Empty Cyl.: </strong><span id="p-cyl"></span></td>
+            <td style="text-align:right;font-weight:700;color:#1a5e20">Total</td>
+            <td id="p-total" style="font-weight:700;text-align:center"></td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="pm-footer">
+        <div class="pm-notes">
+          <p><strong>Note :-</strong></p>
+          <p>1. E.&amp; O.E.</p>
+          <p>2. All Subject to Rewa Jurisdication</p>
+        </div>
+        <div class="pm-sig">Signature</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Storage ──
+const STORE='usha_cashmemos';
+let memos=JSON.parse(localStorage.getItem(STORE)||'[]');
+function saveToStore(){localStorage.setItem(STORE,JSON.stringify(memos));}
+
+// ── Tab switching ──
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-new').style.display=t==='new'?'block':'none';
+  document.getElementById('tab-saved').style.display=t==='saved'?'block':'none';
+  if(t==='saved')renderSaved();
+}
+
+// ── Row management ──
+let rowId=0;
+function addRow(){
+  const tbody=document.getElementById('itemsBody');
+  const tr=document.createElement('tr');
+  const sno=tbody.rows.length+1;
+  tr.dataset.rid=++rowId;
+  tr.innerHTML=`
+    <td class="sno">${sno}</td>
+    <td class="part-cell"><input type="text" placeholder="Item description" oninput="calcTotal()"></td>
+    <td><input type="number" placeholder="0" min="0" oninput="calcRow(this.closest('tr'))"></td>
+    <td><input type="number" placeholder="0.00" min="0" step="0.01" oninput="calcRow(this.closest('tr'))"></td>
+    <td><input type="number" placeholder="0.00" readonly style="background:#f8fafc;font-weight:600;color:#1d4ed8"></td>
+    <td><button class="del-row" onclick="delRow(this)">×</button></td>
+  `;
+  tbody.appendChild(tr);
+  renumberRows();
+  tr.querySelector('input[type=text]').focus();
+}
+function calcRow(tr){
+  const nums=tr.querySelectorAll('input[type=number]');
+  const qty=parseFloat(nums[0].value)||0;
+  const rate=parseFloat(nums[1].value)||0;
+  nums[2].value=(qty*rate).toFixed(2);
+  calcTotal();
+}
+function delRow(btn){
+  btn.closest('tr').remove();
+  renumberRows();
+  calcTotal();
+}
+function renumberRows(){
+  document.querySelectorAll('#itemsBody tr').forEach((tr,i)=>{
+    tr.querySelector('.sno').textContent=i+1;
+  });
+}
+function calcTotal(){
+  let total=0;
+  document.querySelectorAll('#itemsBody tr').forEach(tr=>{
+    const v=parseFloat(tr.querySelectorAll('input[type=number]')[2]?.value)||0;
+    total+=v;
+  });
+  document.getElementById('totalCell').textContent='₹'+total.toFixed(2);
+}
+
+// ── Reset ──
+function resetForm(){
+  document.getElementById('memoNo').value='';
+  document.getElementById('memoDate').value=new Date().toISOString().slice(0,10);
+  document.getElementById('memoName').value='';
+  document.getElementById('memoChallan').value='';
+  document.getElementById('emptyCyl').value='';
+  document.getElementById('itemsBody').innerHTML='';
+  calcTotal();
+  addRow();
+}
+
+// ── Save ──
+function saveMemo(){
+  const memoNo=document.getElementById('memoNo').value.trim();
+  if(!memoNo){showToast('Please enter a Memo No.');return;}
+  const name=document.getElementById('memoName').value.trim();
+  if(!name){showToast('Please enter customer name.');return;}
+  const rows=[];
+  document.querySelectorAll('#itemsBody tr').forEach((tr,i)=>{
+    const textIns=tr.querySelectorAll('input[type=text]');
+    const numIns=tr.querySelectorAll('input[type=number]');
+    rows.push({sno:i+1,part:textIns[0]?.value||'',qty:numIns[0]?.value||'',rate:numIns[1]?.value||'',amount:numIns[2]?.value||'0'});
+  });
+  const total=rows.reduce((s,r)=>s+(parseFloat(r.amount)||0),0);
+  const memo={
+    id:Date.now(),memoNo,
+    date:document.getElementById('memoDate').value,
+    name,
+    challan:document.getElementById('memoChallan').value,
+    emptyCyl:document.getElementById('emptyCyl').value,
+    rows,total
+  };
+  const idx=memos.findIndex(x=>x.memoNo===memoNo);
+  if(idx>=0)memos[idx]=memo; else memos.unshift(memo);
+  saveToStore();
+  showToast('Memo #'+memoNo+' saved!');
+}
+
+// ── Load ──
+function loadMemo(m){
+  document.getElementById('memoNo').value=m.memoNo;
+  document.getElementById('memoDate').value=m.date;
+  document.getElementById('memoName').value=m.name;
+  document.getElementById('memoChallan').value=m.challan;
+  document.getElementById('emptyCyl').value=m.emptyCyl||'';
+  document.getElementById('itemsBody').innerHTML='';
+  m.rows.forEach(r=>{
+    addRow();
+    const tr=document.getElementById('itemsBody').lastElementChild;
+    const textIns=tr.querySelectorAll('input[type=text]');
+    const numIns=tr.querySelectorAll('input[type=number]');
+    if(textIns[0])textIns[0].value=r.part;
+    if(numIns[0])numIns[0].value=r.qty;
+    if(numIns[1])numIns[1].value=r.rate;
+    if(numIns[2])numIns[2].value=r.amount;
+  });
+  calcTotal();
+  switchTab('new');
+  document.querySelector('.tab').classList.add('active');
+  document.querySelectorAll('.tab')[1].classList.remove('active');
+}
+
+// ── Render saved ──
+function renderSaved(){
+  const el=document.getElementById('savedList');
+  if(!memos.length){el.innerHTML='<div class="empty-state">📄 No saved memos yet</div>';return;}
+  el.innerHTML=memos.map(m=>`
+    <div class="inv-item" onclick='loadMemo(${JSON.stringify(m).replace(/'/g,"&#39;")})'>
+      <div class="inv-item-left">
+        <span class="inv-no">Memo #${m.memoNo}</span>
+        <span class="inv-meta">${m.name} · ${m.date}</span>
+      </div>
+      <span class="inv-amount">₹${parseFloat(m.total).toLocaleString('en-IN',{minimumFractionDigits:2})}</span>
+    </div>
+  `).join('');
+}
+
+// ── Build print area ──
+window.addEventListener('beforeprint',buildPrint);
+function buildPrint(){
+  document.getElementById('p-memoNo').textContent=document.getElementById('memoNo').value||'__________';
+  document.getElementById('p-date').textContent=document.getElementById('memoDate').value||'__________';
+  document.getElementById('p-name').textContent=document.getElementById('memoName').value||'__________';
+  document.getElementById('p-challan').textContent=document.getElementById('memoChallan').value||'__________';
+  document.getElementById('p-cyl').textContent=document.getElementById('emptyCyl').value||'';
+  const tbody=document.getElementById('p-items');
+  tbody.innerHTML='';
+  let total=0;
+  document.querySelectorAll('#itemsBody tr').forEach((tr,i)=>{
+    const textIns=tr.querySelectorAll('input[type=text]');
+    const numIns=tr.querySelectorAll('input[type=number]');
+    const amt=parseFloat(numIns[2]?.value)||0;
+    total+=amt;
+    tbody.innerHTML+=`<tr>
+      <td>${i+1}</td>
+      <td class="part">${textIns[0]?.value||''}</td>
+      <td>${numIns[0]?.value||''}</td>
+      <td>${numIns[1]?.value||''}</td>
+      <td>${amt?amt.toFixed(2):''}</td>
+    </tr>`;
+  });
+  // pad to at least 8 rows
+  const rowCount=document.querySelectorAll('#itemsBody tr').length;
+  for(let i=rowCount;i<8;i++){
+    tbody.innerHTML+=`<tr><td>${i+1}</td><td class="part">&nbsp;</td><td></td><td></td><td></td></tr>`;
+  }
+  document.getElementById('p-total').textContent=total?'₹'+total.toFixed(2):'';
+  document.getElementById('printArea').style.display='block';
+}
+window.addEventListener('afterprint',()=>{
+  document.getElementById('printArea').style.display='none';
+});
+
+// ── Toast ──
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ── Init ──
+document.getElementById('memoDate').value=new Date().toISOString().slice(0,10);
+addRow();
+</script>
+</body>
+</html>
